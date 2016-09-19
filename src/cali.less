@@ -1,0 +1,43 @@
+@from: left; @to: right;
+
+@primary: #f06; @primary-font: #fff;
+@second: #ddd; @second-font: #000;
+
+@radius: 5px;
+
+.resetButton(){
+  border: 0;
+  background: none;
+  margin: 0;
+}
+
+* { box-sizing: border-box; }
+
+[data-cali] {
+  width: 80%; margin: 0 10%;
+  border: 1px solid @primary;
+  border-radius: @radius;
+
+  [data-cali-header] {
+    display: flex;  flex-direction: row;  align-items: center;  justify-content: space-between;
+
+    [data-cali-header-title] { font-size: 20px; color: @primary; }
+    [data-cali-btn-group] {
+      border: 1px solid @primary;
+      border-radius: @radius;
+      margin: 0 10px;
+
+      button {
+        .resetButton();
+        padding: 10px;
+        background-color: fade(@primary, 10%);
+
+        &[data-cali-view-btn-active]{
+          background-color: fade(@primary, 80%); color: @primary-font;
+          &:hover { background-color: @primary; }
+        }
+        &:hover { background-color: fade(@primary, 20%); }
+      }
+    }
+  }
+}

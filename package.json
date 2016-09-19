@@ -1,0 +1,14 @@
+{
+  "name": "cali",
+  "version": "1.0.0",
+  "description": "calendar, as it should be",
+  "main": "src/cali.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "calendar"
+  ],
+  "author": "Shota",
+  "license": "MIT"
+}
