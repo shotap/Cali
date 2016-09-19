@@ -32,13 +32,14 @@ var config = {
     monthNamesShort: ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"]
 };
 
-var DateFormater = function (d: Date, format: string): string {
-    let res = '';
-    switch (format){
-        case 'D MMM': res = '' + d.getDate() + ' ' + config.monthNamesShort[d.getMonth()]; break;
-        case 'D MMMM': res = '' + d.getDate() + ' ' + config.monthNames[d.getMonth()]; break;
-        case 'MMMM YYYY': res = '' + config.monthNames[d.getMonth()] + ' ' + d.getFullYear(); break;
-    }
+var DateFormat = function (d: Date, format: string): string {
+    let res = format;
+
+    res = res.replace(/YYYY/g, '' + d.getFullYear());
+    res = res.replace(/MMMM/g, config.monthNames[d.getMonth()]);
+    res = res.replace(/MMM/g, config.monthNamesShort[d.getMonth()]);
+    res = res.replace(/D/g, '' + d.getDate());
+
     return res;
 };
 
@@ -240,7 +241,7 @@ class CaliContentMonthView extends CaliContentView {
         return d;
     }
     getTitle(): string{
-        return DateFormater(this.getCali().getActiveDate(), 'MMMM YYYY');
+        return DateFormat(this.getCali().getActiveDate(), 'MMMM YYYY');
     }
 }
 class CaliContentWeekView extends CaliContentView {
@@ -264,7 +265,7 @@ class CaliContentWeekView extends CaliContentView {
         return d;
     }
     getTitle(): string {
-        return '' + DateFormater(this.getViewStart(), 'D MMM') + ' - ' + DateFormater(this.getViewEnd(), 'D MMM');
+        return '' + DateFormat(this.getViewStart(), 'D MMM') + ' - ' + DateFormat(this.getViewEnd(), 'D MMM');
     }
 }
 class CaliContentDayView extends CaliContentView {
@@ -274,7 +275,7 @@ class CaliContentDayView extends CaliContentView {
     }
 
     getTitle(): string {
-        return DateFormater(this.getCali().getActiveDate(), 'D MMMM');
+        return DateFormat(this.getCali().getActiveDate(), 'D MMMM');
     }
 }
 class CaliContentYearView extends CaliContentView {
