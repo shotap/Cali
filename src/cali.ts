@@ -27,7 +27,19 @@ interface iEvent {
 var config = {
     classPrefix: 'cali',
     view: 'week',
-    headerButtons: 'year,month,week,day'
+    headerButtons: 'year,month,week,day',
+    monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    monthNamesShort: ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"]
+};
+
+var DateFormater = function (d: Date, format: string): string {
+    let res = '';
+    switch (format){
+        case 'D MMM': res = '' + d.getDate() + ' ' + config.monthNamesShort[d.getMonth()]; break;
+        case 'D MMMM': res = '' + d.getDate() + ' ' + config.monthNames[d.getMonth()]; break;
+        case 'MMMM YYYY': res = '' + config.monthNames[d.getMonth()] + ' ' + d.getFullYear(); break;
+    }
+    return res;
 };
 
 class EventList {
@@ -136,7 +148,7 @@ class CaliHeaderButtonsView extends CaliView {
         btn.appendChild(document.createTextNode(type));
         btn.setAttribute('data-' + config.classPrefix + '-btn', '');
 
-        if (type !== 'today') {
+        if (['today', 'next', 'prev'].indexOf(type) === -1) {
             if (this.getCali().getCurrentView() === type){
                 btn.setAttribute('data-' + config.classPrefix + '-view-btn-active', '');
             }
@@ -149,8 +161,14 @@ class CaliHeaderButtonsView extends CaliView {
                 e.srcElement.setAttribute('data-' + config.classPrefix + '-view-btn-active', '');
                 this.getCali().setView(type);
             });
-        } else
-            btn.addEventListener('click', () => { this.getCali().resetDate(); });
+        } else {
+            switch (type){
+                case 'today': btn.addEventListener('click', () => { this.getCali().today(); }); break;
+                case 'next': btn.addEventListener('click', () => { this.getCali().next(); }); break;
+                case 'prev': btn.addEventListener('click', () => { this.getCali().prev(); });break;
+            }
+        }
+
 
         this.element.appendChild(btn);
     }
@@ -193,14 +211,11 @@ abstract class CaliContentView extends CaliView {
         return '' + Math.random();
     }
 
-    abstract getViewStart(): Date;
-    abstract getViewEnd(): Date;
-
     clean(): void {
         this.element.innerHTML = '';
     }
     render(): void{
-        let x = document.createTextNode('Now this is view ' + this.viewName + ' and some random numbers: ' + Math.random());
+        let x = document.createTextNode('Now this is view ' + this.viewName + ' and some random numbers: ' + Math.random() + ' and the current date is: ' + this.getCali().getActiveDate());
         this.element.appendChild(x);
     }
 }
@@ -210,8 +225,23 @@ class CaliContentMonthView extends CaliContentView {
         this.viewName = 'month';
     }
 
-    getViewStart(): Date {return new Date();}
-    getViewEnd(): Date {return new Date();}
+    getViewStart(): Date {
+        let base = this.getCali().getActiveDate();
+        let d = new Date();
+        d.setFullYear(base.getFullYear(), base.getMonth(), 1);
+
+        return d;
+    }
+    getViewEnd(): Date {
+        let base = this.getCali().getActiveDate();
+        let d = new Date();
+        d.setFullYear(base.getFullYear(), base.getMonth() + 1, 0);
+
+        return d;
+    }
+    getTitle(): string{
+        return DateFormater(this.getCali().getActiveDate(), 'MMMM YYYY');
+    }
 }
 class CaliContentWeekView extends CaliContentView {
     constructor(element: Element, parent: CaliView, events: EventList){
@@ -219,8 +249,23 @@ class CaliContentWeekView extends CaliContentView {
         this.viewName = 'week';
     }
 
-    getViewStart(): Date {return new Date();}
-    getViewEnd(): Date {return new Date();}
+    getViewStart(): Date {
+        let base: Date = this.getCali().getActiveDate();
+        let d = new Date();
+        d.setDate(base.getDate() - base.getDay());
+
+        return d;
+    }
+    getViewEnd(): Date {
+        let base: Date = this.getCali().getActiveDate();
+        let d = new Date();
+        d.setDate(base.getDate() + (6 - base.getDay()));
+
+        return d;
+    }
+    getTitle(): string {
+        return '' + DateFormater(this.getViewStart(), 'D MMM') + ' - ' + DateFormater(this.getViewEnd(), 'D MMM');
+    }
 }
 class CaliContentDayView extends CaliContentView {
     constructor(element: Element, parent: CaliView, events: EventList){
@@ -228,8 +273,9 @@ class CaliContentDayView extends CaliContentView {
         this.viewName = 'day';
     }
 
-    getViewStart(): Date {return new Date();}
-    getViewEnd(): Date {return new Date();}
+    getTitle(): string {
+        return DateFormater(this.getCali().getActiveDate(), 'D MMMM');
+    }
 }
 class CaliContentYearView extends CaliContentView {
     constructor(element: Element, parent: CaliView, events: EventList){
@@ -237,8 +283,19 @@ class CaliContentYearView extends CaliContentView {
         this.viewName = 'year';
     }
 
-    getViewStart(): Date {return new Date();}
-    getViewEnd(): Date {return new Date();}
+    getViewStart(): Date {
+        let d = new Date();
+        d.setFullYear(this.getCali().getActiveDate().getFullYear(), 0, 11);
+        return d;
+    }
+    getViewEnd(): Date {
+        let d = new Date();
+        d.setFullYear(this.getCali().getActiveDate().getFullYear(), 11, 31);
+        return d;
+    }
+    getTitle(): string {
+        return '' + this.getCali().getActiveDate().getFullYear();
+    }
 }
 
 class Cali {
@@ -251,6 +308,11 @@ class Cali {
     constructor(element: Element) {
         this.element = element;
 
+        this.contentElement = this.element.querySelectorAll('[data-' + config.classPrefix + '-content]')[0];
+        if (this.contentElement){
+            this.setView(this.contentElement.getAttribute('data-' + config.classPrefix + '-content'));
+        }
+
         let header = this.element.querySelectorAll('[data-' + config.classPrefix + '-header]')[0];
         let headerObj: CaliView = null;
         if (header){
@@ -259,10 +321,7 @@ class Cali {
         }
         this.header = headerObj;
 
-        this.contentElement = this.element.querySelectorAll('[data-' + config.classPrefix + '-content]')[0];
-        if (this.contentElement){
-            this.setView(this.contentElement.getAttribute('data-' + config.classPrefix + '-content'));
-        }
+        this.activeDate = new Date();
 
         this.render();
     }
@@ -276,17 +335,44 @@ class Cali {
             case 'year': contentObj = new CaliContentYearView(this.contentElement, null, new EventList(null)); break;
             default: throw 'Not supported view type';
         }
+        if (contentObj){
+            contentObj.setCali(this);
+        }
         this.content = contentObj;
 
         this.render();
     }
-    getTitle(): string {
-        return this.content.getTitle();
-    }
     getCurrentView(): string {
         return this.content.getViewName();
     }
-    resetDate(): void {
+    getActiveDate(): Date {
+        return this.activeDate;
+    }
+    getTitle(): string {
+        return this.content.getTitle();
+    }
+    next(): void {
+        switch (this.content.getViewName()) {
+            case 'month':this.activeDate.setFullYear(this.activeDate.getFullYear(), this.activeDate.getMonth() + 1); break;
+            case 'week': this.activeDate.setDate(this.activeDate.getDate() + 7); break;
+            case 'day':  this.activeDate.setDate(this.activeDate.getDate() + 1); break;
+            case 'year': this.activeDate.setDate(this.activeDate.getDate() + 365); break;
+        }
+
+        this.render();
+    }
+    prev(): void {
+        switch (this.content.getViewName()){
+            case 'month':this.activeDate.setFullYear(this.activeDate.getFullYear(), this.activeDate.getMonth() - 1); break;
+            case 'week':  this.activeDate.setDate(this.activeDate.getDate() - 7); break;
+            case 'day':   this.activeDate.setDate(this.activeDate.getDate() - 1); break;
+            case 'year':  this.activeDate.setDate(this.activeDate.getDate() - 365); break;
+        }
+
+        this.render();
+    }
+    today(): void {
+        this.activeDate = new Date();
         this.render();
     }
     clean(): void {
