@@ -36,8 +36,8 @@ class EventList {
     constructor(events: iEvent[]){
         this.events = events;
     }
-    compare(other): boolean {
-        this.events.forEach( (event, index) => {
+    compare(other: EventList): boolean {
+        this.events.forEach( (event: iEvent, index: number) => {
             if (other[index].uid !== event.uid)
                 return false;
         });
@@ -49,7 +49,6 @@ class EventList {
             this.events.forEach(callback);
     }
 }
-
 abstract class CaliView {
     element: Element;
     parent: CaliView;
@@ -63,6 +62,7 @@ abstract class CaliView {
     setCali(cali: Cali){
         this.cali = cali;
     }
+
     getCali(): Cali {
         if (!this.cali) {
             let parent:CaliView = this;
@@ -180,7 +180,7 @@ abstract class CaliContentView extends CaliView {
     events: EventList;
     viewName: string;
 
-    constructor(element: Element, parent, events: EventList){
+    constructor(element: Element, parent: CaliView, events: EventList){
         super(element, parent);
 
         this.events = events;
@@ -205,7 +205,7 @@ abstract class CaliContentView extends CaliView {
     }
 }
 class CaliContentMonthView extends CaliContentView {
-    constructor(element: Element, parent, events: EventList){
+    constructor(element: Element, parent: CaliView, events: EventList){
         super(element, parent, events);
         this.viewName = 'month';
     }
@@ -214,7 +214,7 @@ class CaliContentMonthView extends CaliContentView {
     getViewEnd(): Date {return new Date();}
 }
 class CaliContentWeekView extends CaliContentView {
-    constructor(element: Element, parent, events: EventList){
+    constructor(element: Element, parent: CaliView, events: EventList){
         super(element, parent, events);
         this.viewName = 'week';
     }
@@ -223,7 +223,7 @@ class CaliContentWeekView extends CaliContentView {
     getViewEnd(): Date {return new Date();}
 }
 class CaliContentDayView extends CaliContentView {
-    constructor(element: Element, parent, events: EventList){
+    constructor(element: Element, parent: CaliView, events: EventList){
         super(element, parent, events);
         this.viewName = 'day';
     }
@@ -232,7 +232,7 @@ class CaliContentDayView extends CaliContentView {
     getViewEnd(): Date {return new Date();}
 }
 class CaliContentYearView extends CaliContentView {
-    constructor(element: Element, parent, events: EventList){
+    constructor(element: Element, parent: CaliView, events: EventList){
         super(element, parent, events);
         this.viewName = 'year';
     }
@@ -246,7 +246,7 @@ class Cali {
     header: CaliView;
     content: CaliContentView;
     activeDate: Date;
-    contentElement;
+    contentElement: Element;
 
     constructor(element: Element) {
         this.element = element;
@@ -266,8 +266,8 @@ class Cali {
 
         this.render();
     }
-    setView(type): void {
-        let contentObj = null;
+    setView(type: string): void {
+        let contentObj: CaliContentView = null;
         if (this.content && this.content.getViewName() === type) return;
         switch (type){
             case 'month': contentObj = new CaliContentMonthView(this.contentElement, null, new EventList(null)); break;
