@@ -10,6 +10,11 @@
   background: none;
   margin: 0;
 }
+.resetUL(){
+  padding: 0;
+  margin: 0;
+  li { list-style: none; }
+}
 
 * { box-sizing: border-box;
 }
@@ -38,6 +43,39 @@
           &:hover { background-color: @primary; }
         }
         &:hover { background-color: fade(@primary, 20%); }
+      }
+    }
+  }
+
+  [data-cali-content] {
+    padding-top: 15px;
+    height: 500px;
+    font-size: 14px;
+
+    [data-cali-day] {
+      .resetUL();
+      width: 100%; height: 100%;  overflow: auto;
+
+      li {
+        background: fade(@primary, 10%);
+        padding: 3px;
+        height: 25px;
+
+        &:nth-child(odd) {
+          background: fade(@primary, 20%);
+        }
+      }
+    }
+
+    [data-cali-week] {
+      .resetUL();
+      width: 100%; height: 100%;  overflow: auto;
+
+      [data-cali-day-in-week] {
+        float:left; width: calc(100%/7);
+        border-@{to}: 1px solid @primary;
+
+        &:last-of-type {  border: 0;  }
       }
     }
   }
