@@ -17,11 +17,10 @@
 interface iEvent {
     uid: string|number,
     title: string,
-    start: Date|string,
-    end: Date|string,
+    start: Date,
+    end: Date,
     summary?: string,
-    organizer?: string,
-    toString(): string
+    organizer?: string
 }
 
 var DateFormat = function (d: Date, format: string): string {
@@ -31,6 +30,8 @@ var DateFormat = function (d: Date, format: string): string {
     res = res.replace(/MMMM/g, config.monthNames[d.getMonth()]);
     res = res.replace(/MMM/g, config.monthNamesShort[d.getMonth()]);
     res = res.replace(/D/g, '' + d.getDate());
+    res = res.replace(/dddd/g, '' + config.dayNamesShort[d.getDay()]);
+    res = res.replace(/ddd/g, '' + config.dayNames[d.getDay()]);
 
     return res;
 };
@@ -38,9 +39,12 @@ var DateFormat = function (d: Date, format: string): string {
 var config = {
     classPrefix: 'cali',
     view: 'week',
+    rowHeight: 25,
     headerButtons: 'year,month,week,day',
     monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    monthNamesShort: ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    monthNamesShort: ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    dayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    dayNamesShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 };
 
 class EventList {
@@ -194,6 +198,7 @@ class CaliHeaderButtonsView extends CaliView {
         });
     }
 }
+
 abstract class CaliContentView extends CaliView {
     events: EventList;
     viewName: string;
@@ -207,14 +212,89 @@ abstract class CaliContentView extends CaliView {
     getViewName(): string {
         return this.viewName;
     }
-    abstract getTitle(): string;
+    getTimeColumn(): Element {
+        let timeColumn = document.createElement('ol');
+        timeColumn.setAttribute('data-' + config.classPrefix + '-time-column', '');
 
+        for (let i = 0; i < 24; i++){
+            let item = document.createElement('li');
+            let z = '' + Math.floor(i);
+            z = (z.length === 1 ? '0' + z : z) + ':00';
+            item.appendChild(document.createTextNode(z));
+
+            timeColumn.appendChild(item);
+        }
+
+        return timeColumn;
+    }
+    getDayGrid(d?: Date): Element {
+        let list = document.createElement('ol');
+        list.setAttribute('data-' + config.classPrefix + '-day-grid', '');
+
+        if (d) {
+            let listTitle = document.createElement('li');
+            listTitle.appendChild(document.createTextNode(DateFormat(d, 'ddd D')));
+            listTitle.setAttribute('data-' + config.classPrefix + '-day-grid-title', '');
+            list.appendChild(listTitle);
+        }
+        for (let i = 0; i < 48; i++){
+            let listItem = document.createElement('li');
+            list.appendChild(listItem);
+        }
+
+        return list;
+    }
+    getEventObject(event: iEvent): Element{
+        let eventObj = document.createElement('li');
+        eventObj.setAttribute('data-' + config.classPrefix + '-event', '');
+        eventObj.style.top = '' + ((event.start.getHours()+(event.start.getMinutes()/60))*25*2+25) + 'px';
+        eventObj.appendChild(document.createTextNode(event.title));
+
+        if (event.start.getDay() === event.end.getDay()){ // start and end in the same day
+            eventObj.style.height = '' + ((event.end.getTime()-event.start.getTime())/36e5*25*2) + 'px';
+        }
+
+        return eventObj;
+    }
     clean(): void {
         this.element.innerHTML = '';
     }
     render(): void{
-        let x = document.createTextNode('Now this is view ' + this.viewName + ' and some random numbers: ' + Math.random() + ' and the current date is: ' + this.getCali().getActiveDate());
-        this.element.appendChild(x);
+        this.renderGrid();
+        this.renderContent();
+    }
+
+    abstract getTitle(): string;
+    abstract getViewStart(): Date;
+    abstract getViewEnd(): Date;
+    abstract renderGrid(): void;
+    abstract renderContent(): void;
+}
+class CaliContentYearView extends CaliContentView {
+    constructor(element: Element, parent: CaliView, events: EventList){
+        super(element, parent, events);
+        this.viewName = 'year';
+    }
+
+    getViewStart(): Date {
+        let d = new Date();
+        d.setFullYear(this.getCali().getActiveDate().getFullYear(), 0, 11);
+        return d;
+    }
+    getViewEnd(): Date {
+        let d = new Date();
+        d.setFullYear(this.getCali().getActiveDate().getFullYear(), 11, 31);
+        return d;
+    }
+    getTitle(): string {
+        return '' + this.getCali().getActiveDate().getFullYear();
+    }
+
+    renderGrid(): void {
+
+    }
+    renderContent(): void {
+
     }
 }
 class CaliContentMonthView extends CaliContentView {
@@ -240,6 +320,13 @@ class CaliContentMonthView extends CaliContentView {
     getTitle(): string{
         return DateFormat(this.getCali().getActiveDate(), 'MMMM YYYY');
     }
+
+    renderGrid(): void {
+
+    }
+    renderContent(): void {
+
+    }
 }
 class CaliContentWeekView extends CaliContentView {
     constructor(element: Element, parent: CaliView, events: EventList){
@@ -264,28 +351,25 @@ class CaliContentWeekView extends CaliContentView {
     getTitle(): string {
         return '' + DateFormat(this.getViewStart(), 'D MMM') + ' - ' + DateFormat(this.getViewEnd(), 'D MMM');
     }
-    render(): void {
-        let masterList = document.createElement('ul');
+
+    renderGrid(): void {
+        let masterList = document.createElement('ol');
         masterList.setAttribute('data-' + config.classPrefix + '-week', '');
 
         for (let j = 0; j < 7; j++){
             let masterListItem = document.createElement('li');
             masterListItem.setAttribute('data-' + config.classPrefix + '-day-in-week', '');
-
-            let list = document.createElement('ul');
-            list.setAttribute('data-' + config.classPrefix + '-day', '');
-
-            for (let i = 0; i < 48; i++){
-                let listItem = document.createElement('li');
-                listItem.appendChild(document.createTextNode('bla #' + i));
-                list.appendChild(listItem);
-            }
-
-            masterListItem.appendChild(list);
+            let d = this.getViewStart();
+            d.setDate(d.getDate() + j);
+            masterListItem.appendChild(this.getDayGrid(d));
             masterList.appendChild(masterListItem);
         }
 
+        this.element.appendChild(this.getTimeColumn());
         this.element.appendChild(masterList);
+    }
+    renderContent(): void {
+
     }
 }
 class CaliContentDayView extends CaliContentView {
@@ -294,40 +378,43 @@ class CaliContentDayView extends CaliContentView {
         this.viewName = 'day';
     }
 
+    getViewStart(): Date {
+        let base: Date = this.getCali().getActiveDate();
+        let d = new Date(base.getTime());
+        d.setHours(0, 0, 0, 0);
+
+        return d;
+
+    }
+    getViewEnd(): Date {
+        let base: Date = this.getCali().getActiveDate();
+        let d = new Date(base.getTime());
+        d.setHours(23, 59, 59, 0);
+
+        return d;
+    }
     getTitle(): string {
         return DateFormat(this.getCali().getActiveDate(), 'D MMMM');
     }
-    render(): void {
-        let list = document.createElement('ul');
-        list.setAttribute('data-' + config.classPrefix + '-day', '');
 
-        for (let i = 0; i < 48; i++){
-            let listItem = document.createElement('li');
-            listItem.appendChild(document.createTextNode('' + Math.floor(i/2) + ':' + (i%2?'30':'00')));
-            list.appendChild(listItem);
-        }
+    renderGrid(): void {
+        this.element.appendChild(this.getTimeColumn());
+        this.element.appendChild(this.getDayGrid(this.getCali().getActiveDate()));
+    }
+    renderContent(): void {
+        let list = document.createElement('ol');
+        list.setAttribute('data-' + config.classPrefix + '-content-wrap', '');
+
+        let e = {
+            uid: '123',
+            title: 'bla blu',
+            start: new Date('2016/09/21 04:00:00'),
+            end: new Date('2016/09/21 05:20:00')
+        };
+
+        list.appendChild(this.getEventObject(e));
 
         this.element.appendChild(list);
-    }
-}
-class CaliContentYearView extends CaliContentView {
-    constructor(element: Element, parent: CaliView, events: EventList){
-        super(element, parent, events);
-        this.viewName = 'year';
-    }
-
-    getViewStart(): Date {
-        let d = new Date();
-        d.setFullYear(this.getCali().getActiveDate().getFullYear(), 0, 11);
-        return d;
-    }
-    getViewEnd(): Date {
-        let d = new Date();
-        d.setFullYear(this.getCali().getActiveDate().getFullYear(), 11, 31);
-        return d;
-    }
-    getTitle(): string {
-        return '' + this.getCali().getActiveDate().getFullYear();
     }
 }
 

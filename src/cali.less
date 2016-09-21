@@ -1,8 +1,6 @@
 @from: left; @to: right;
-
 @primary: #f06; @primary-font: #fff;
 @second: #ddd; @second-font: #000;
-
 @radius: 5px;
 
 .resetButton(){
@@ -15,17 +13,29 @@
   margin: 0;
   li { list-style: none; }
 }
+.list-item(){
+  background: fade(@second, 10%);
+  padding: 3px; min-height: 25px;
+  padding-@{from}: 5px;
+  border-bottom: 1px solid @second;
 
-* { box-sizing: border-box;
+  &:nth-child(even) {
+    background: fade(@second, 20%);
+  }
 }
 
 [data-cali] {
+  box-sizing: border-box;
   width: 80%; margin: 0 10%;
+  padding: 5px;
+  height: 600px;
   border: 1px solid @primary;
   border-radius: @radius;
+  * { box-sizing: border-box; }
 
   [data-cali-header] {
-    display: flex;  flex-direction: row;  align-items: center;  justify-content: space-between;
+    display: flex;  flex-direction: row;  align-items: center;
+    justify-content: space-between; height: 50px;
 
     [data-cali-header-title] { font-size: 20px; color: @primary; }
     [data-cali-btn-group] {
@@ -46,36 +56,61 @@
       }
     }
   }
-
   [data-cali-content] {
-    padding-top: 15px;
-    height: 500px;
+    margin-top: 15px;
+    position: relative;
     font-size: 14px;
+    border: 1px solid @second;
+    height: ~"calc(100% - 65px)"; overflow: auto;
 
-    [data-cali-day] {
+    [data-cali-day-grid] {
       .resetUL();
-      width: 100%; height: 100%;  overflow: auto;
+      width: 100%; height: 100%;
 
-      li {
-        background: fade(@primary, 10%);
-        padding: 3px;
-        height: 25px;
-
-        &:nth-child(odd) {
-          background: fade(@primary, 20%);
-        }
+      li { .list-item(); }
+      [data-cali-day-grid-title] {
+        background: #fff;
+        color: @primary;
+        font-weight: 700;
+        text-align: center;
+        border-bottom: 1px solid @primary;
       }
     }
-
     [data-cali-week] {
       .resetUL();
-      width: 100%; height: 100%;  overflow: auto;
+      width: 100%;
 
       [data-cali-day-in-week] {
-        float:left; width: calc(100%/7);
+        float: @from;
+        width: ~"calc((100% - 50px)/7)";
         border-@{to}: 1px solid @primary;
 
         &:last-of-type {  border: 0;  }
+      }
+    }
+    [data-cali-time-column] {
+      .resetUL();
+      width: 50px; float: @from;
+      border-@{to}: 1px solid @primary;
+      padding-top: 25px;
+
+      li {
+        .list-item();
+        background: #fff; min-height: 50px;
+        &:nth-child(1) { border-top: 1px solid @second; }
+        &:nth-child(even){ background: #fff;}
+      }
+    }
+    [data-cali-content-wrap] {
+      .resetUL();
+      position: absolute; top: 0; @{from}: 50px; @{to}: 0;
+
+      [data-cali-event] {
+        position: absolute;
+        margin: 3px; background: #008000;
+        left: 0; right: 0; padding: 2px;
+        color: #fff; font-size: 11px;
+        border: 1px solid #000;
       }
     }
   }
