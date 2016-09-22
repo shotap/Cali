@@ -409,7 +409,7 @@ class CaliContentDayView extends CaliContentView {
             uid: '123',
             title: 'bla blu',
             start: new Date('2016/09/21 04:00:00'),
-            end: new Date('2016/09/21 05:20:00')
+            end: new Date('2016/09/21 05:10:00')
         };
 
         list.appendChild(this.getEventObject(e));
