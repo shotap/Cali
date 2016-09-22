@@ -36,6 +36,21 @@ var DateFormat = function (d: Date, format: string): string {
     return res;
 };
 
+var data = [
+    {uid: 1,  title: '1',   start: new Date('2016/09/22 04:00:00') , end: new Date('2016/09/22 06:00:00')},
+    {uid: 2,  title: '2',   start: new Date('2016/09/22 07:00:00') , end: new Date('2016/09/22 09:00:00')},
+    {uid: 3,  title: '3',   start: new Date('2016/09/23 05:00:00') , end: new Date('2016/09/23 07:00:00')},
+    {uid: 4,  title: '4',   start: new Date('2016/09/23 06:00:00') , end: new Date('2016/09/23 07:00:00')},
+    {uid: 5,  title: '5',   start: new Date('2016/09/24 04:00:00') , end: new Date('2016/09/24 12:00:00')},
+    {uid: 6,  title: '6',   start: new Date('2016/09/24 04:00:00') , end: new Date('2016/09/24 06:00:00')},
+    {uid: 7,  title: '7',   start: new Date('2016/09/25 04:00:00') , end: new Date('2016/09/26 04:00:00')},
+    {uid: 8,  title: '8',   start: new Date('2016/09/25 04:00:00') , end: new Date('2016/09/27 04:00:00')},
+    {uid: 9,  title: '9',   start: new Date('2016/09/26 04:00:00') , end: new Date('2016/09/26 05:00:00')},
+    {uid: 10, title: '10',  start: new Date('2016/09/26 04:00:00') , end: new Date('2016/09/26 06:00:00')},
+    {uid: 11, title: '11',  start: new Date('2016/09/27 04:00:00') , end: new Date('2016/09/27 05:00:00')},
+    {uid: 12, title: '12',  start: new Date('2016/09/27 04:00:00') , end: new Date('2016/09/27 06:00:00')},
+];
+
 var config = {
     classPrefix: 'cali',
     view: 'week',
@@ -64,6 +79,17 @@ class EventList {
     forEach(callback: (value: iEvent) => void) {
         if (this.events)
             this.events.forEach(callback);
+    }
+    getFiltered(startD: Date, endD: Date){
+        let res = [];
+
+        this.events.map( (event: iEvent) => {
+            if (event.start.getTime() > startD.getTime() && event.end.getTime() < endD.getTime()){
+                res.push(event);
+            }
+        });
+
+        return res;
     }
 }
 
@@ -200,13 +226,10 @@ class CaliHeaderButtonsView extends CaliView {
 }
 
 abstract class CaliContentView extends CaliView {
-    events: EventList;
     viewName: string;
 
-    constructor(element: Element, parent: CaliView, events: EventList){
+    constructor(element: Element, parent: CaliView){
         super(element, parent);
-
-        this.events = events;
         this.viewName = '';
     }
     getViewName(): string {
@@ -244,18 +267,32 @@ abstract class CaliContentView extends CaliView {
 
         return list;
     }
-    getEventObject(event: iEvent): Element{
+    getEventObject(event: iEvent, viewStart?: Date): Element{
         let eventObj = document.createElement('li');
         eventObj.setAttribute('data-' + config.classPrefix + '-event', '');
-        eventObj.style.top = '' + ((event.start.getHours()+(event.start.getMinutes()/60))*25*2+25) + 'px';
+        eventObj.style.top = '' + ((event.start.getHours()+(event.start.getMinutes()/60))*config.rowHeight*2+config.rowHeight) + 'px';
         eventObj.appendChild(document.createTextNode(event.title));
 
         if (event.start.getDay() === event.end.getDay()){ // start and end in the same day
-            eventObj.style.height = '' + ((event.end.getTime()-event.start.getTime())/36e5*25*2) + 'px';
+            eventObj.style.height = '' + ((event.end.getTime()-event.start.getTime())/36e5*config.rowHeight*2) + 'px';
+        }
+
+        if (viewStart && viewStart.getDay() !== event.start.getDay()){ //this is not a day view, need to calculate the offset from the week start
+            eventObj.style.width = "calc((100% - 50px)/7)";
+            eventObj.style.left = "calc(100%/7*" + event.start.getDay() + ")";
+            console.log(event.title, event.start.getDay());
         }
 
         return eventObj;
     }
+    getFilteredEvents(startD?: Date, endD?: Date): iEvent[] {
+        startD = startD || this.getViewStart();
+        endD = endD || this.getViewEnd();
+
+        let events = this.getCali().getEventList();
+        return events.getFiltered(startD, endD);
+    }
+
     clean(): void {
         this.element.innerHTML = '';
     }
@@ -271,8 +308,8 @@ abstract class CaliContentView extends CaliView {
     abstract renderContent(): void;
 }
 class CaliContentYearView extends CaliContentView {
-    constructor(element: Element, parent: CaliView, events: EventList){
-        super(element, parent, events);
+    constructor(element: Element, parent: CaliView){
+        super(element, parent);
         this.viewName = 'year';
     }
 
@@ -298,8 +335,8 @@ class CaliContentYearView extends CaliContentView {
     }
 }
 class CaliContentMonthView extends CaliContentView {
-    constructor(element: Element, parent: CaliView, events: EventList){
-        super(element, parent, events);
+    constructor(element: Element, parent: CaliView){
+        super(element, parent);
         this.viewName = 'month';
     }
 
@@ -329,8 +366,8 @@ class CaliContentMonthView extends CaliContentView {
     }
 }
 class CaliContentWeekView extends CaliContentView {
-    constructor(element: Element, parent: CaliView, events: EventList){
-        super(element, parent, events);
+    constructor(element: Element, parent: CaliView){
+        super(element, parent);
         this.viewName = 'week';
     }
 
@@ -369,12 +406,16 @@ class CaliContentWeekView extends CaliContentView {
         this.element.appendChild(masterList);
     }
     renderContent(): void {
+        let list = document.createElement('ol');
+        list.setAttribute('data-' + config.classPrefix + '-content-wrap', '');
 
+        this.getFilteredEvents().forEach( (event) => list.appendChild(this.getEventObject(event, this.getViewStart())) );
+        this.element.appendChild(list);
     }
 }
 class CaliContentDayView extends CaliContentView {
-    constructor(element: Element, parent: CaliView, events: EventList){
-        super(element, parent, events);
+    constructor(element: Element, parent: CaliView){
+        super(element, parent);
         this.viewName = 'day';
     }
 
@@ -405,28 +446,24 @@ class CaliContentDayView extends CaliContentView {
         let list = document.createElement('ol');
         list.setAttribute('data-' + config.classPrefix + '-content-wrap', '');
 
-        let e = {
-            uid: '123',
-            title: 'bla blu',
-            start: new Date('2016/09/21 04:00:00'),
-            end: new Date('2016/09/21 05:10:00')
-        };
-
-        list.appendChild(this.getEventObject(e));
-
+        this.getFilteredEvents().forEach( (event) => list.appendChild(this.getEventObject(event)) );
         this.element.appendChild(list);
     }
 }
 
 class Cali {
     element: Element;
+    events: EventList;
     header: CaliView;
     content: CaliContentView;
     activeDate: Date;
     contentElement: Element;
 
-    constructor(element: Element) {
+    constructor(element: Element, events?: iEvent[]) {
         this.element = element;
+        this.activeDate = new Date();
+        if (events)
+            this.events = new EventList(events);
 
         this.contentElement = this.element.querySelectorAll('[data-' + config.classPrefix + '-content]')[0];
         if (this.contentElement){
@@ -441,7 +478,6 @@ class Cali {
         }
         this.header = headerObj;
 
-        this.activeDate = new Date();
 
         this.render();
     }
@@ -449,10 +485,10 @@ class Cali {
         let contentObj: CaliContentView = null;
         if (this.content && this.content.getViewName() === type) return;
         switch (type){
-            case 'month': contentObj = new CaliContentMonthView(this.contentElement, null, new EventList(null)); break;
-            case 'week': contentObj = new CaliContentWeekView(this.contentElement, null, new EventList(null)); break;
-            case 'day': contentObj = new CaliContentDayView(this.contentElement, null, new EventList(null)); break;
-            case 'year': contentObj = new CaliContentYearView(this.contentElement, null, new EventList(null)); break;
+            case 'month': contentObj = new CaliContentMonthView(this.contentElement, null); break;
+            case 'week': contentObj = new CaliContentWeekView(this.contentElement, null); break;
+            case 'day': contentObj = new CaliContentDayView(this.contentElement, null); break;
+            case 'year': contentObj = new CaliContentYearView(this.contentElement, null); break;
             default: throw 'Not supported view type';
         }
         if (contentObj){
@@ -470,6 +506,9 @@ class Cali {
     }
     getTitle(): string {
         return this.content.getTitle();
+    }
+    getEventList(): EventList {
+        return this.events;
     }
     next(): void {
         switch (this.content.getViewName()) {
@@ -506,10 +545,8 @@ class Cali {
     }
 }
 
-(() => {
-    let caliElements = document.querySelectorAll('[data-' + config.classPrefix + ']');
+let caliElements = document.querySelectorAll('[data-' + config.classPrefix + ']');
 
-    for (let i = 0; i < caliElements.length; i++){
-        new Cali(caliElements[i]);
+for (let i = 0; i < caliElements.length; i++){
+        new Cali(caliElements[i], data);
     }
-})();
