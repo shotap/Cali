@@ -42,10 +42,13 @@ var DateFormat = function (d: Date, format: string): string {
 var data = [
     {uid: 1,  title: '1',   start: new Date('2016/09/22 04:00:00') , end: new Date('2016/09/22 06:00:00')},
     {uid: 2,  title: '2',   start: new Date('2016/09/22 07:00:00') , end: new Date('2016/09/22 09:00:00')},
-    {uid: 3,  title: '3',   start: new Date('2016/09/23 05:00:00') , end: new Date('2016/09/23 07:00:00')},
+    {uid: 3,  title: '3',   start: new Date('2016/09/23 05:00:00') , end: new Date('2016/09/23 08:00:00')},
+    {uid: 3,  title: '3!',   start: new Date('2016/09/23 08:15:00') , end: new Date('2016/09/23 10:00:00')},
     {uid: 3,  title: 'pi',   start: new Date('2016/09/23 05:00:00') , end: new Date('2016/09/23 05:30:00')},
     {uid: 4,  title: '4',   start: new Date('2016/09/23 06:00:00') , end: new Date('2016/09/23 07:00:00')},
-    {uid: 4,  title: 'po',   start: new Date('2016/09/23 06:30:00') , end: new Date('2016/09/23 07:00:00')},
+    {uid: 4,  title: 'po',   start: new Date('2016/09/23 06:30:00') , end: new Date('2016/09/23 07:20:00')},
+    {uid: 4,  title: 'pe',   start: new Date('2016/09/23 06:45:00') , end: new Date('2016/09/23 07:45:00')},
+    {uid: 4,  title: 'ze',   start: new Date('2016/09/23 07:35:00') , end: new Date('2016/09/23 09:45:00')},
     {uid: 5,  title: '5',   start: new Date('2016/09/24 04:00:00') , end: new Date('2016/09/24 12:00:00')},
     {uid: 6,  title: '6',   start: new Date('2016/09/24 04:00:00') , end: new Date('2016/09/24 06:00:00')},
     {uid: 7,  title: '7',   start: new Date('2016/09/25 04:00:00') , end: new Date('2016/09/26 04:00:00')},
@@ -275,7 +278,7 @@ abstract class CaliContentView extends CaliView {
 
         return list;
     }
-    getEventElement(event: iEvent, isWeek?: boolean): Element{
+    getEventElement(event: iEvent, index: number, maxOffset: number, isWeek?: boolean): Element{
         let eventElement = document.createElement('li');
         eventElement.setAttribute('data-' + config.classPrefix + '-event', '');
         eventElement.style.top = '' + ((event.start.getHours()+(event.start.getMinutes()/60))*config.rowHeight*2+config.rowHeight) + 'px';
@@ -286,8 +289,10 @@ abstract class CaliContentView extends CaliView {
         }
 
         if (isWeek){ //this is not a day view, need to calculate the offset from the week start
-            eventElement.style.width = "calc((100% - 50px)/7" + (event.overlap>1?"/"+event.overlap:"") + ")";
-            eventElement.style.left = "calc(100%/7*" + event.start.getDay() + (event.offset?" + "+event.offset+"*(100% - 50px)/7" + (event.overlap>1?"/"+event.overlap:""):"") + ")";
+            //eventElement.style.width = "calc((100% - 50px)/7" + (event.overlap>1?"/2":"") + ")";
+            eventElement.style.left = "calc(100%/7*" + event.start.getDay() + (event.offset?" + "+event.offset+"*(100% - 50px)/7" + (event.overlap?"/"+maxOffset:""):"") + ")";
+            eventElement.style.right = "calc(100%/7*" + (7-event.start.getDay()-1) + ")";
+            eventElement.style.zIndex = "" + (100+event.offset);
         }
 
         return eventElement;
@@ -299,22 +304,24 @@ abstract class CaliContentView extends CaliView {
         let events = this.getCali().getEventList();
         return this.checkOverlap(events.getFilteredAndSorted(startD, endD));
     }
-    checkOverlap(arr: iEvent[]){
+    checkOverlap(arr: iEvent[]): [iEvent[], number]{
+        let maxOffset = 0;
         for (let i = 0; i < arr.length; i++){
             arr[i].offset = 0;
-            arr[i].overlap = 1;
+            arr[i].overlap = 0;
         }
 
         for (let i = 0; i < arr.length; i++){
             for (let j = i + 1; j < arr.length; j++){
                 if (arr[i].start.getTime() <= arr[j].end.getTime() && arr[i].end.getTime() >= arr[j].start.getTime()) {
                     arr[i].overlap++; arr[j].overlap++;
-                    arr[j].offset = arr[i].offset + 1;
+                    maxOffset = Math.max(maxOffset, arr[i].overlap, arr[j].overlap);
+                    arr[j].offset++;// = arr[i].offset + 1;
                 } else break;
             }
         }
 
-        return arr;
+        return [arr, maxOffset];
     }
 
     clean(): void {
@@ -433,7 +440,8 @@ class CaliContentWeekView extends CaliContentView {
         let list = document.createElement('ol');
         list.setAttribute('data-' + config.classPrefix + '-content-wrap', '');
 
-        this.getFilteredEvents().forEach( (event) => list.appendChild(this.getEventElement(event, true)) );
+        let filttered: [iEvent[], number] = this.getFilteredEvents();
+        filttered[0].forEach( (event, i) => list.appendChild(this.getEventElement(event, i, filttered[1], true)) );
         this.element.appendChild(list);
     }
 }
@@ -470,7 +478,8 @@ class CaliContentDayView extends CaliContentView {
         let list = document.createElement('ol');
         list.setAttribute('data-' + config.classPrefix + '-content-wrap', '');
 
-        this.getFilteredEvents().forEach( (event) => list.appendChild(this.getEventElement(event)) );
+        let filtered: [iEvent[], number] = this.getFilteredEvents();
+        filtered[0].forEach( (event, i) => list.appendChild(this.getEventElement(event, i, filtered[1])) );
         this.element.appendChild(list);
     }
 }
