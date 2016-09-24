@@ -43,8 +43,9 @@ var data = [
     {uid: 1,  title: '1',   start: new Date('2016/09/22 04:00:00') , end: new Date('2016/09/22 06:00:00')},
     {uid: 2,  title: '2',   start: new Date('2016/09/22 07:00:00') , end: new Date('2016/09/22 09:00:00')},
     {uid: 3,  title: '3',   start: new Date('2016/09/23 05:00:00') , end: new Date('2016/09/23 07:00:00')},
-    {uid: 3,  title: 'pi',   start: new Date('2016/09/23 05:00:00') , end: new Date('2016/09/23 06:15:00')},
+    {uid: 3,  title: 'pi',   start: new Date('2016/09/23 05:00:00') , end: new Date('2016/09/23 05:30:00')},
     {uid: 4,  title: '4',   start: new Date('2016/09/23 06:00:00') , end: new Date('2016/09/23 07:00:00')},
+    {uid: 4,  title: 'po',   start: new Date('2016/09/23 06:30:00') , end: new Date('2016/09/23 07:00:00')},
     {uid: 5,  title: '5',   start: new Date('2016/09/24 04:00:00') , end: new Date('2016/09/24 12:00:00')},
     {uid: 6,  title: '6',   start: new Date('2016/09/24 04:00:00') , end: new Date('2016/09/24 06:00:00')},
     {uid: 7,  title: '7',   start: new Date('2016/09/25 04:00:00') , end: new Date('2016/09/26 04:00:00')},
@@ -122,7 +123,7 @@ abstract class CaliView {
                 parent = parent.parent;
             }
 
-            return parent.cali;
+            this.cali = parent.cali;
         }
 
         return this.cali;
@@ -540,7 +541,6 @@ class Cali {
             case 'day':  this.activeDate.setDate(this.activeDate.getDate() + 1); break;
             case 'year': this.activeDate.setDate(this.activeDate.getDate() + 365); break;
         }
-console.log(this.activeDate);
         this.render();
     }
     prev(): void {
@@ -571,5 +571,5 @@ console.log(this.activeDate);
 let caliElements = document.querySelectorAll('[data-' + config.classPrefix + ']');
 
 for (let i = 0; i < caliElements.length; i++){
-        new Cali(caliElements[i], data);
-    }
+    new Cali(caliElements[i], data);
+}
