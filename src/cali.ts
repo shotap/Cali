@@ -20,7 +20,10 @@ interface iEvent {
     start: Date,
     end: Date,
     summary?: string,
-    organizer?: string
+    organizer?: string,
+
+    overlap?: number,
+    offset?: number
 }
 
 var DateFormat = function (d: Date, format: string): string {
@@ -40,6 +43,7 @@ var data = [
     {uid: 1,  title: '1',   start: new Date('2016/09/22 04:00:00') , end: new Date('2016/09/22 06:00:00')},
     {uid: 2,  title: '2',   start: new Date('2016/09/22 07:00:00') , end: new Date('2016/09/22 09:00:00')},
     {uid: 3,  title: '3',   start: new Date('2016/09/23 05:00:00') , end: new Date('2016/09/23 07:00:00')},
+    {uid: 3,  title: 'pi',   start: new Date('2016/09/23 05:00:00') , end: new Date('2016/09/23 06:15:00')},
     {uid: 4,  title: '4',   start: new Date('2016/09/23 06:00:00') , end: new Date('2016/09/23 07:00:00')},
     {uid: 5,  title: '5',   start: new Date('2016/09/24 04:00:00') , end: new Date('2016/09/24 12:00:00')},
     {uid: 6,  title: '6',   start: new Date('2016/09/24 04:00:00') , end: new Date('2016/09/24 06:00:00')},
@@ -61,32 +65,35 @@ var config = {
     dayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
     dayNamesShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 };
-
 class EventList {
     events: iEvent[];
 
     constructor(events: iEvent[]){
         this.events = events;
     }
-    compare(other: EventList): boolean {
-        this.events.forEach( (event: iEvent, index: number) => {
-            if (other[index].uid !== event.uid)
-                return false;
-        });
-
-        return true;
-    }
     forEach(callback: (value: iEvent) => void) {
         if (this.events)
             this.events.forEach(callback);
     }
-    getFiltered(startD: Date, endD: Date){
-        let res = [];
-
+    getFilteredAndSorted(startD: Date, endD: Date): iEvent[]{
+        let res: iEvent[] = [];
         this.events.map( (event: iEvent) => {
             if (event.start.getTime() > startD.getTime() && event.end.getTime() < endD.getTime()){
                 res.push(event);
             }
+        });
+
+        res.sort( (a: iEvent, b: iEvent) => {
+            let startFirst = a.start.getTime() - b.start.getTime();
+            if (startFirst > 0) return 1;
+            if (startFirst < 0) return -1;
+            // return 0;
+
+            let longer = (a.end.getTime() - a.start.getTime()) - (b.end.getTime() - b.end.getTime());
+            if (longer > 0) return -1;
+            if (longer < 0) return 1;
+
+            return 0;
         });
 
         return res;
@@ -115,13 +122,13 @@ abstract class CaliView {
                 parent = parent.parent;
             }
 
-            this.cali = parent.cali;
+            return parent.cali;
         }
 
         return this.cali;
     }
-    clean(): void {}
-    render(): void {}
+    abstract clean(): void;
+    abstract render(): void;
 }
 class CaliHeaderView extends CaliView {
     children: CaliView[];
@@ -267,30 +274,46 @@ abstract class CaliContentView extends CaliView {
 
         return list;
     }
-    getEventObject(event: iEvent, viewStart?: Date): Element{
-        let eventObj = document.createElement('li');
-        eventObj.setAttribute('data-' + config.classPrefix + '-event', '');
-        eventObj.style.top = '' + ((event.start.getHours()+(event.start.getMinutes()/60))*config.rowHeight*2+config.rowHeight) + 'px';
-        eventObj.appendChild(document.createTextNode(event.title));
+    getEventElement(event: iEvent, isWeek?: boolean): Element{
+        let eventElement = document.createElement('li');
+        eventElement.setAttribute('data-' + config.classPrefix + '-event', '');
+        eventElement.style.top = '' + ((event.start.getHours()+(event.start.getMinutes()/60))*config.rowHeight*2+config.rowHeight) + 'px';
+        eventElement.appendChild(document.createTextNode(event.title));
 
         if (event.start.getDay() === event.end.getDay()){ // start and end in the same day
-            eventObj.style.height = '' + ((event.end.getTime()-event.start.getTime())/36e5*config.rowHeight*2) + 'px';
+            eventElement.style.height = '' + ((event.end.getTime()-event.start.getTime())/36e5*config.rowHeight*2) + 'px';
         }
 
-        if (viewStart && viewStart.getDay() !== event.start.getDay()){ //this is not a day view, need to calculate the offset from the week start
-            eventObj.style.width = "calc((100% - 50px)/7)";
-            eventObj.style.left = "calc(100%/7*" + event.start.getDay() + ")";
-            console.log(event.title, event.start.getDay());
+        if (isWeek){ //this is not a day view, need to calculate the offset from the week start
+            eventElement.style.width = "calc((100% - 50px)/7" + (event.overlap>1?"/"+event.overlap:"") + ")";
+            eventElement.style.left = "calc(100%/7*" + event.start.getDay() + (event.offset?" + "+event.offset+"*(100% - 50px)/7" + (event.overlap>1?"/"+event.overlap:""):"") + ")";
         }
 
-        return eventObj;
+        return eventElement;
     }
     getFilteredEvents(startD?: Date, endD?: Date): iEvent[] {
         startD = startD || this.getViewStart();
         endD = endD || this.getViewEnd();
 
         let events = this.getCali().getEventList();
-        return events.getFiltered(startD, endD);
+        return this.checkOverlap(events.getFilteredAndSorted(startD, endD));
+    }
+    checkOverlap(arr: iEvent[]){
+        for (let i = 0; i < arr.length; i++){
+            arr[i].offset = 0;
+            arr[i].overlap = 1;
+        }
+
+        for (let i = 0; i < arr.length; i++){
+            for (let j = i + 1; j < arr.length; j++){
+                if (arr[i].start.getTime() <= arr[j].end.getTime() && arr[i].end.getTime() >= arr[j].start.getTime()) {
+                    arr[i].overlap++; arr[j].overlap++;
+                    arr[j].offset = arr[i].offset + 1;
+                } else break;
+            }
+        }
+
+        return arr;
     }
 
     clean(): void {
@@ -409,7 +432,7 @@ class CaliContentWeekView extends CaliContentView {
         let list = document.createElement('ol');
         list.setAttribute('data-' + config.classPrefix + '-content-wrap', '');
 
-        this.getFilteredEvents().forEach( (event) => list.appendChild(this.getEventObject(event, this.getViewStart())) );
+        this.getFilteredEvents().forEach( (event) => list.appendChild(this.getEventElement(event, true)) );
         this.element.appendChild(list);
     }
 }
@@ -446,7 +469,7 @@ class CaliContentDayView extends CaliContentView {
         let list = document.createElement('ol');
         list.setAttribute('data-' + config.classPrefix + '-content-wrap', '');
 
-        this.getFilteredEvents().forEach( (event) => list.appendChild(this.getEventObject(event)) );
+        this.getFilteredEvents().forEach( (event) => list.appendChild(this.getEventElement(event)) );
         this.element.appendChild(list);
     }
 }
@@ -517,7 +540,7 @@ class Cali {
             case 'day':  this.activeDate.setDate(this.activeDate.getDate() + 1); break;
             case 'year': this.activeDate.setDate(this.activeDate.getDate() + 365); break;
         }
-
+console.log(this.activeDate);
         this.render();
     }
     prev(): void {
