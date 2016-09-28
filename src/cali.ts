@@ -40,23 +40,23 @@ var DateFormat = function (d: Date, format: string): string {
 };
 
 var data = [
-    {uid: 1,  title: '1',   start: new Date('2016/09/22 04:00:00') , end: new Date('2016/09/22 06:00:00')},
-    {uid: 2,  title: '2',   start: new Date('2016/09/22 07:00:00') , end: new Date('2016/09/22 09:00:00')},
-    {uid: 3,  title: '3',   start: new Date('2016/09/23 05:00:00') , end: new Date('2016/09/23 08:00:00')},
-    {uid: 3,  title: '3!',   start: new Date('2016/09/23 08:15:00') , end: new Date('2016/09/23 10:00:00')},
-    {uid: 3,  title: 'pi',   start: new Date('2016/09/23 05:00:00') , end: new Date('2016/09/23 05:30:00')},
-    {uid: 4,  title: '4',   start: new Date('2016/09/23 06:00:00') , end: new Date('2016/09/23 07:00:00')},
-    {uid: 4,  title: 'po',   start: new Date('2016/09/23 06:30:00') , end: new Date('2016/09/23 07:20:00')},
-    {uid: 4,  title: 'pe',   start: new Date('2016/09/23 06:45:00') , end: new Date('2016/09/23 07:45:00')},
-    {uid: 4,  title: 'ze',   start: new Date('2016/09/23 07:35:00') , end: new Date('2016/09/23 09:45:00')},
-    {uid: 5,  title: '5',   start: new Date('2016/09/24 04:00:00') , end: new Date('2016/09/24 12:00:00')},
-    {uid: 6,  title: '6',   start: new Date('2016/09/24 04:00:00') , end: new Date('2016/09/24 06:00:00')},
-    {uid: 7,  title: '7',   start: new Date('2016/09/25 04:00:00') , end: new Date('2016/09/26 04:00:00')},
-    {uid: 8,  title: '8',   start: new Date('2016/09/25 04:00:00') , end: new Date('2016/09/27 04:00:00')},
-    {uid: 9,  title: '9',   start: new Date('2016/09/26 04:00:00') , end: new Date('2016/09/26 05:00:00')},
-    {uid: 10, title: '10',  start: new Date('2016/09/26 04:00:00') , end: new Date('2016/09/26 06:00:00')},
-    {uid: 11, title: '11',  start: new Date('2016/09/27 04:00:00') , end: new Date('2016/09/27 05:00:00')},
-    {uid: 12, title: '12',  start: new Date('2016/09/27 04:00:00') , end: new Date('2016/09/27 06:00:00')},
+    {uid: 11,  title: '1',       start: new Date('2016/09/26 04:00:00') , end: new Date('2016/09/26 06:00:00')},
+    {uid: 12,  title: '2',       start: new Date('2016/09/26 07:00:00') , end: new Date('2016/09/26 09:00:00')},
+    {uid: 13,  title: '3',       start: new Date('2016/09/27 05:00:00') , end: new Date('2016/09/27 08:00:00')},
+    {uid: 14,  title: '3!',      start: new Date('2016/09/27 08:15:00') , end: new Date('2016/09/27 10:00:00')},
+    {uid: 15,  title: 'pi',      start: new Date('2016/09/27 05:00:00') , end: new Date('2016/09/27 05:30:00')},
+    {uid: 16,  title: '4',       start: new Date('2016/09/27 06:00:00') , end: new Date('2016/09/27 07:00:00')},
+    {uid: 17,  title: 'po',      start: new Date('2016/09/27 06:30:00') , end: new Date('2016/09/27 07:20:00')},
+    {uid: 18,  title: 'pe',      start: new Date('2016/09/27 06:45:00') , end: new Date('2016/09/27 07:45:00')},
+    {uid: 19,  title: 'ze',      start: new Date('2016/09/27 07:35:00') , end: new Date('2016/09/27 09:45:00')},
+    {uid: 20,  title: '5',       start: new Date('2016/09/28 04:00:00') , end: new Date('2016/09/28 12:00:00')},
+    {uid: 21,  title: '6',       start: new Date('2016/09/28 04:00:00') , end: new Date('2016/09/28 06:00:00')},
+    {uid: 22,  title: '7',       start: new Date('2016/09/29 04:00:00') , end: new Date('2016/09/29 08:00:00')},
+    {uid: 23,  title: '8',       start: new Date('2016/09/29 04:00:00') , end: new Date('2016/10/10 02:00:00')},
+    {uid: 24,  title: '9',       start: new Date('2016/09/28 04:00:00') , end: new Date('2016/09/28 05:00:00')},
+    {uid: 25, title: '10',      start: new Date('2016/09/28 04:00:00') , end: new Date('2016/09/28 06:00:00')},
+    {uid: 26, title: '11',      start: new Date('2016/09/29 04:00:00') , end: new Date('2016/09/29 05:00:00')},
+    {uid: 27, title: '12',      start: new Date('2016/09/30 04:00:00') , end: new Date('2016/09/30 06:00:00')},
 ];
 
 var config = {
@@ -82,7 +82,7 @@ class EventList {
     getFilteredAndSorted(startD: Date, endD: Date): iEvent[]{
         let res: iEvent[] = [];
         this.events.map( (event: iEvent) => {
-            if (event.start.getTime() > startD.getTime() && event.end.getTime() < endD.getTime()){
+            if (event.start.getTime() > startD.getTime() && event.start.getTime() < endD.getTime()){
                 res.push(event);
             }
         });
@@ -93,7 +93,7 @@ class EventList {
             if (startFirst < 0) return -1;
             // return 0;
 
-            let longer = (a.end.getTime() - a.start.getTime()) - (b.end.getTime() - b.end.getTime());
+            let longer = a.end.getTime() - b.end.getTime();
             if (longer > 0) return -1;
             if (longer < 0) return 1;
 
@@ -201,7 +201,7 @@ class CaliHeaderButtonsView extends CaliView {
                     other[i].removeAttribute('data-' + config.classPrefix + '-view-btn-active');
                 }
                 e.srcElement.setAttribute('data-' + config.classPrefix + '-view-btn-active', '');
-                this.getCali().setView(type);
+                this.getCali().setView(type, true);
             });
         } else {
             switch (type){
@@ -278,26 +278,61 @@ abstract class CaliContentView extends CaliView {
 
         return list;
     }
-    getEventElement(event: iEvent, index: number, maxOffset: number, isWeek?: boolean): Element{
+    getEventElement(event: iEvent, parent: Element, maxOffset: number, isWeek?: boolean): Element[]{
+        let res: Element[] = [];
         let eventElement = document.createElement('li');
-        eventElement.setAttribute('data-' + config.classPrefix + '-event', '');
+        eventElement.setAttribute('data-' + config.classPrefix + '-event', ''+event.uid);
         eventElement.style.top = '' + ((event.start.getHours()+(event.start.getMinutes()/60))*config.rowHeight*2+config.rowHeight) + 'px';
         eventElement.appendChild(document.createTextNode(event.title));
 
         if (event.start.getDay() === event.end.getDay()){ // start and end in the same day
             eventElement.style.height = '' + ((event.end.getTime()-event.start.getTime())/36e5*config.rowHeight*2) + 'px';
+        } else {
+            let midnight = new Date();
+            midnight.setTime(event.start.getTime());
+            midnight.setHours(24, 0, 0);
+            eventElement.style.height = '' + ((midnight.getTime()-event.start.getTime())/36e5*config.rowHeight*2) + 'px';
+
+            if (isWeek) {
+                let leftover = (event.end.getTime() - event.start.getTime()) / 36e5 - (midnight.getTime() - event.start.getTime()) / 36e5;
+                let leftoverDays = Math.min(Math.floor(leftover / 24) + 1, 6 - event.start.getDay()); // if this event starts but dosent end this week
+
+                for (let i = 1; i <= leftoverDays; i++) {
+                    let delta = Math.min(24, leftover - (24 * (i - 1)));
+                    let _event = JSON.parse(JSON.stringify(event)); // deep copy the event
+
+                    let _start = new Date();
+                    _start.setTime(event.start.getTime());
+                    _start.setDate(_start.getDate() + i);
+                    _start.setHours(0, 1, 0);
+
+                    let _end = new Date();
+                    _end.setTime(_start.getTime());
+                    if (delta === 24) _end.setHours(23, 59);
+                    else            _end.setHours(delta);
+
+                    _event.start = _start;
+                    _event.end = _end;
+
+                    this.getEventElement(_event, parent, maxOffset, isWeek).forEach((r) => res.push(r));
+                }
+            }
         }
 
-        if (isWeek){ //this is not a day view, need to calculate the offset from the week start
-            //eventElement.style.width = "calc((100% - 50px)/7" + (event.overlap>1?"/2":"") + ")";
-            eventElement.style.left = "calc(100%/7*" + event.start.getDay() + (event.offset?" + "+event.offset+"*(100% - 50px)/7" + (event.overlap?"/"+maxOffset:""):"") + ")";
+        ///TODO: add rtl support
+        if (isWeek){
+            eventElement.style.left = "calc(100%/7*" + event.start.getDay() + (event.offset?" + "+event.offset+"*(100% - 50px)/7" + (event.overlap?"/"+(1+maxOffset):""):"") + ")";
             eventElement.style.right = "calc(100%/7*" + (7-event.start.getDay()-1) + ")";
-            eventElement.style.zIndex = "" + (100+event.offset);
+        } else {
+            eventElement.style.left = event.offset ? "calc(" +event.offset + "*10%" : "0";
+            eventElement.style.right = "0";
         }
 
-        return eventElement;
+        eventElement.style.zIndex = "" + (100+event.offset);
+        res.push(eventElement);
+        return res;
     }
-    getFilteredEvents(startD?: Date, endD?: Date): iEvent[] {
+    getFilteredEvents(startD?: Date, endD?: Date): [iEvent[], number] {
         startD = startD || this.getViewStart();
         endD = endD || this.getViewEnd();
 
@@ -316,7 +351,8 @@ abstract class CaliContentView extends CaliView {
                 if (arr[i].start.getTime() <= arr[j].end.getTime() && arr[i].end.getTime() >= arr[j].start.getTime()) {
                     arr[i].overlap++; arr[j].overlap++;
                     maxOffset = Math.max(maxOffset, arr[i].overlap, arr[j].overlap);
-                    arr[j].offset++;// = arr[i].offset + 1;
+                    //arr[j].offset++;
+                    arr[j].offset = arr[i].offset + 1;
                 } else break;
             }
         }
@@ -441,7 +477,7 @@ class CaliContentWeekView extends CaliContentView {
         list.setAttribute('data-' + config.classPrefix + '-content-wrap', '');
 
         let filttered: [iEvent[], number] = this.getFilteredEvents();
-        filttered[0].forEach( (event, i) => list.appendChild(this.getEventElement(event, i, filttered[1], true)) );
+        filttered[0].forEach( (event, i) => this.getEventElement(event, list, filttered[1], true).forEach( (e) => { list.appendChild(e); } ) );
         this.element.appendChild(list);
     }
 }
@@ -479,7 +515,7 @@ class CaliContentDayView extends CaliContentView {
         list.setAttribute('data-' + config.classPrefix + '-content-wrap', '');
 
         let filtered: [iEvent[], number] = this.getFilteredEvents();
-        filtered[0].forEach( (event, i) => list.appendChild(this.getEventElement(event, i, filtered[1])) );
+        filtered[0].forEach( (event, i) => this.getEventElement(event, list, filtered[1]).forEach( (e) => list.appendChild(e) ) );
         this.element.appendChild(list);
     }
 }
@@ -500,7 +536,7 @@ class Cali {
 
         this.contentElement = this.element.querySelectorAll('[data-' + config.classPrefix + '-content]')[0];
         if (this.contentElement){
-            this.setView(this.contentElement.getAttribute('data-' + config.classPrefix + '-content'));
+            this.setView(this.contentElement.getAttribute('data-' + config.classPrefix + '-content'), false);
         }
 
         let header = this.element.querySelectorAll('[data-' + config.classPrefix + '-header]')[0];
@@ -514,7 +550,7 @@ class Cali {
 
         this.render();
     }
-    setView(type: string): void {
+    setView(type: string, toRender: boolean): void {
         let contentObj: CaliContentView = null;
         if (this.content && this.content.getViewName() === type) return;
         switch (type){
@@ -528,8 +564,8 @@ class Cali {
             contentObj.setCali(this);
         }
         this.content = contentObj;
-
-        this.render();
+        //if (toRender)
+            this.render();
     }
     getCurrentView(): string {
         return this.content.getViewName();
