@@ -82,7 +82,7 @@ class EventList {
     getFilteredAndSorted(startD: Date, endD: Date): iEvent[]{
         let res: iEvent[] = [];
         this.events.map( (event: iEvent) => {
-            if (event.start.getTime() > startD.getTime() && event.start.getTime() < endD.getTime()){
+            if (event.start.getTime() <= endD.getTime() && event.end.getTime() >= startD.getTime()){
                 res.push(event);
             }
         });
@@ -91,7 +91,6 @@ class EventList {
             let startFirst = a.start.getTime() - b.start.getTime();
             if (startFirst > 0) return 1;
             if (startFirst < 0) return -1;
-            // return 0;
 
             let longer = a.end.getTime() - b.end.getTime();
             if (longer > 0) return -1;
@@ -308,8 +307,8 @@ abstract class CaliContentView extends CaliView {
 
                     let _end = new Date();
                     _end.setTime(_start.getTime());
-                    if (delta === 24) _end.setHours(23, 59);
-                    else            _end.setHours(delta);
+                    if (delta === 24)   _end.setHours(23, 59);
+                    else                _end.setHours(delta);
 
                     _event.start = _start;
                     _event.end = _end;
@@ -564,8 +563,7 @@ class Cali {
             contentObj.setCali(this);
         }
         this.content = contentObj;
-        //if (toRender)
-            this.render();
+        this.render();
     }
     getCurrentView(): string {
         return this.content.getViewName();
