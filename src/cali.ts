@@ -30,44 +30,54 @@ var DateFormat = function (d: Date, format: string): string {
     let res = format;
 
     res = res.replace(/YYYY/g, '' + d.getFullYear());
-    res = res.replace(/MMMM/g, config.monthNames[d.getMonth()]);
-    res = res.replace(/MMM/g, config.monthNamesShort[d.getMonth()]);
     res = res.replace(/D/g, '' + d.getDate());
     res = res.replace(/dddd/g, '' + config.dayNamesShort[d.getDay()]);
     res = res.replace(/ddd/g, '' + config.dayNames[d.getDay()]);
+    res = res.replace(/MMMM/g, config.monthNames[d.getMonth()]);
+    res = res.replace(/MMM/g, config.monthNamesShort[d.getMonth()]);
 
     return res;
 };
 
 var data = [
-    {uid: 11,  title: '1',       start: new Date('2016/09/26 04:00:00') , end: new Date('2016/09/26 06:00:00')},
-    {uid: 12,  title: '2',       start: new Date('2016/09/26 07:00:00') , end: new Date('2016/09/26 09:00:00')},
-    {uid: 13,  title: '3',       start: new Date('2016/09/27 05:00:00') , end: new Date('2016/09/27 08:00:00')},
-    {uid: 14,  title: '3!',      start: new Date('2016/09/27 08:15:00') , end: new Date('2016/09/27 10:00:00')},
-    {uid: 15,  title: 'pi',      start: new Date('2016/09/27 05:00:00') , end: new Date('2016/09/27 05:30:00')},
-    {uid: 16,  title: '4',       start: new Date('2016/09/27 06:00:00') , end: new Date('2016/09/27 07:00:00')},
-    {uid: 17,  title: 'po',      start: new Date('2016/09/27 06:30:00') , end: new Date('2016/09/27 07:20:00')},
-    {uid: 18,  title: 'pe',      start: new Date('2016/09/27 06:45:00') , end: new Date('2016/09/27 07:45:00')},
-    {uid: 19,  title: 'ze',      start: new Date('2016/09/27 07:35:00') , end: new Date('2016/09/27 09:45:00')},
-    {uid: 20,  title: '5',       start: new Date('2016/09/28 04:00:00') , end: new Date('2016/09/28 12:00:00')},
-    {uid: 21,  title: '6',       start: new Date('2016/09/28 04:00:00') , end: new Date('2016/09/28 06:00:00')},
-    {uid: 22,  title: '7',       start: new Date('2016/09/29 04:00:00') , end: new Date('2016/09/29 08:00:00')},
-    {uid: 23,  title: '8',       start: new Date('2016/09/29 04:00:00') , end: new Date('2016/10/10 02:00:00')},
-    {uid: 24,  title: '9',       start: new Date('2016/09/28 04:00:00') , end: new Date('2016/09/28 05:00:00')},
-    {uid: 25, title: '10',      start: new Date('2016/09/28 04:00:00') , end: new Date('2016/09/28 06:00:00')},
-    {uid: 26, title: '11',      start: new Date('2016/09/29 04:00:00') , end: new Date('2016/09/29 05:00:00')},
-    {uid: 27, title: '12',      start: new Date('2016/09/30 04:00:00') , end: new Date('2016/09/30 06:00:00')},
+    {uid: 11,  title: '1',       start: new Date('2016/10/16 04:00:00') , end: new Date('2016/10/16 06:00:00')},
+    {uid: 12,  title: '2',       start: new Date('2016/10/16 07:00:00') , end: new Date('2016/10/16 09:00:00')},
+    {uid: 13,  title: '3',       start: new Date('2016/10/17 05:00:00') , end: new Date('2016/10/17 08:00:00')},
+    {uid: 14,  title: '3!',      start: new Date('2016/10/17 08:15:00') , end: new Date('2016/10/17 10:00:00')},
+    {uid: 15,  title: 'pi',      start: new Date('2016/10/17 05:00:00') , end: new Date('2016/10/17 05:30:00')},
+    {uid: 16,  title: '4',       start: new Date('2016/10/17 06:00:00') , end: new Date('2016/10/17 07:00:00')},
+    {uid: 17,  title: 'po',      start: new Date('2016/10/17 06:30:00') , end: new Date('2016/10/17 07:20:00')},
+    {uid: 18,  title: 'pe',      start: new Date('2016/10/17 06:45:00') , end: new Date('2016/10/17 07:45:00')},
+    {uid: 19,  title: 'ze',      start: new Date('2016/10/17 07:35:00') , end: new Date('2016/10/17 09:45:00')},
+    {uid: 20,  title: '5',       start: new Date('2016/10/18 04:00:00') , end: new Date('2016/10/18 12:00:00')},
+    {uid: 21,  title: '6',       start: new Date('2016/10/18 04:00:00') , end: new Date('2016/10/18 06:00:00')},
+    {uid: 22,  title: '7',       start: new Date('2016/10/19 04:00:00') , end: new Date('2016/10/19 08:00:00')},
+    {uid: 23,  title: '8',       start: new Date('2016/10/19 04:00:00') , end: new Date('2016/10/10 02:00:00')},
+    {uid: 24,  title: '9',       start: new Date('2016/10/18 04:00:00') , end: new Date('2016/10/18 05:00:00')},
+    {uid: 25, title: '10',       start: new Date('2016/10/18 04:00:00') , end: new Date('2016/10/18 06:00:00')},
+    {uid: 26, title: '11',       start: new Date('2016/10/19 04:00:00') , end: new Date('2016/10/19 05:00:00')},
+    {uid: 27, title: '12',       start: new Date('2016/10/20 04:00:00') , end: new Date('2016/10/20 06:00:00')},
 ];
 
 var config = {
     classPrefix: 'cali',
     view: 'week',
+    rtl: false,
     rowHeight: 25,
     headerButtons: 'year,month,week,day',
     monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     monthNamesShort: ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"],
     dayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    dayNamesShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    dayNamesShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    buttonText: {
+        'day': 'Day',
+        'week': 'Week',
+        'month': 'Month',
+        'year': 'Year',
+        'today': 'Today',
+        'prev': '<',
+        'next': '>'
+    }
 };
 class EventList {
     events: iEvent[];
@@ -118,6 +128,7 @@ abstract class CaliView {
     }
 
     getCali(): Cali {
+        console.log('get cali');
         if (!this.cali) {
             let parent:CaliView = this;
 
@@ -125,7 +136,7 @@ abstract class CaliView {
                 parent = parent.parent;
             }
 
-            this.cali = parent.cali;
+            return parent.cali;
         }
 
         return this.cali;
@@ -186,7 +197,7 @@ class CaliHeaderButtonsView extends CaliView {
 
     addButton(type: string): void{
         let btn = document.createElement('button');
-        btn.appendChild(document.createTextNode(type));
+        btn.appendChild(document.createTextNode( Object.keys(config.buttonText).indexOf(type) != -1 ? config.buttonText[type] : type ));
         btn.setAttribute('data-' + config.classPrefix + '-btn', '');
 
         if (['today', 'next', 'prev'].indexOf(type) === -1) {
@@ -209,7 +220,6 @@ class CaliHeaderButtonsView extends CaliView {
                 case 'prev': btn.addEventListener('click', () => { this.getCali().prev(); });break;
             }
         }
-
 
         this.element.appendChild(btn);
     }
@@ -244,38 +254,6 @@ abstract class CaliContentView extends CaliView {
     }
     getViewName(): string {
         return this.viewName;
-    }
-    getTimeColumn(): Element {
-        let timeColumn = document.createElement('ol');
-        timeColumn.setAttribute('data-' + config.classPrefix + '-time-column', '');
-
-        for (let i = 0; i < 24; i++){
-            let item = document.createElement('li');
-            let z = '' + Math.floor(i);
-            z = (z.length === 1 ? '0' + z : z) + ':00';
-            item.appendChild(document.createTextNode(z));
-
-            timeColumn.appendChild(item);
-        }
-
-        return timeColumn;
-    }
-    getDayGrid(d?: Date): Element {
-        let list = document.createElement('ol');
-        list.setAttribute('data-' + config.classPrefix + '-day-grid', '');
-
-        if (d) {
-            let listTitle = document.createElement('li');
-            listTitle.appendChild(document.createTextNode(DateFormat(d, 'ddd D')));
-            listTitle.setAttribute('data-' + config.classPrefix + '-day-grid-title', '');
-            list.appendChild(listTitle);
-        }
-        for (let i = 0; i < 48; i++){
-            let listItem = document.createElement('li');
-            list.appendChild(listItem);
-        }
-
-        return list;
     }
     getEventElement(event: iEvent, parent: Element, maxOffset: number, isWeek?: boolean): Element[]{
         let res: Element[] = [];
@@ -318,13 +296,22 @@ abstract class CaliContentView extends CaliView {
             }
         }
 
-        ///TODO: add rtl support
         if (isWeek){
-            eventElement.style.left = "calc(100%/7*" + event.start.getDay() + (event.offset?" + "+event.offset+"*(100% - 50px)/7" + (event.overlap?"/"+(1+maxOffset):""):"") + ")";
-            eventElement.style.right = "calc(100%/7*" + (7-event.start.getDay()-1) + ")";
+            if (!config.rtl) {
+                eventElement.style.left = "calc(100%/7*" + event.start.getDay() + (event.offset ? " + " + event.offset + "*(100% - 50px)/7" + (event.overlap ? "/" + (1 + maxOffset) : "") : "") + ")";
+                eventElement.style.right = "calc(100%/7*" + (7 - event.start.getDay() - 1) + ")";
+            } else {
+                eventElement.style.right = "calc(100%/7*" + event.start.getDay() + (event.offset ? " + " + event.offset + "*(100% - 50px)/7" + (event.overlap ? "/" + (1 + maxOffset) : "") : "") + ")";
+                eventElement.style.left = "calc(100%/7*" + (7 - event.start.getDay() - 1) + ")";
+            }
         } else {
-            eventElement.style.left = event.offset ? "calc(" +event.offset + "*10%" : "0";
-            eventElement.style.right = "0";
+            if (!config.rtl) {
+                eventElement.style.left = event.offset ? "calc(" + event.offset + "*10%" : "0";
+                eventElement.style.right = "0";
+            } else {
+                eventElement.style.right = event.offset ? "calc(" + event.offset + "*10%" : "0";
+                eventElement.style.left = "0";
+            }
         }
 
         eventElement.style.zIndex = "" + (100+event.offset);
@@ -407,7 +394,7 @@ class CaliContentMonthView extends CaliContentView {
     }
 
     getViewStart(): Date {
-        let base = this.getCali().getActiveDate();
+        let base: Date = this.getCali().getActiveDate();
         let d = new Date();
         d.setFullYear(base.getFullYear(), base.getMonth(), 1);
 
@@ -425,7 +412,57 @@ class CaliContentMonthView extends CaliContentView {
     }
 
     renderGrid(): void {
+        let tbl = document.createElement('table');
+        tbl.setAttribute('data-' + config.classPrefix + '-month-grid', '');
 
+        let tblHead = document.createElement('thead');
+        let tblHeadRow = document.createElement('tr');
+        tblHeadRow.setAttribute('data-' + config.classPrefix + '-grid-header', '');
+        for (let i = 0; i < 7; i++){
+            let tblHeadRowCell = document.createElement('th');
+            tblHeadRowCell.appendChild(document.createTextNode(config.dayNames[i]));
+            tblHeadRow.appendChild(tblHeadRowCell);
+        }
+        tblHead.appendChild(tblHeadRow);
+        tbl.appendChild(tblHead);
+
+        let tblBody = document.createElement('tbody');
+        let startOfMonth = this.getViewStart();
+        let startOfMonthNumber = startOfMonth.getDay();
+
+        let isActive = false;
+        for (let i = 0; i < 6; i++){
+            let tblRow = document.createElement('tr');
+            tblRow.setAttribute('data-' + config.classPrefix + '-week-in-month', '');
+
+            for (let j = 0; j < 7; j++){
+                let dayNumber = i*7 + j;
+                let cellDate = new Date();
+                cellDate.setDate(startOfMonth.getDate() + dayNumber - startOfMonthNumber);
+
+                let tblRowCell = document.createElement('td');
+                tblRowCell.setAttribute('data-' + config.classPrefix + '-day-in-month', '');
+                tblRowCell.setAttribute('data-' + config.classPrefix + '-day-' + j, '');
+
+                let tblRowCellHeader = document.createElement('div');
+                tblRowCellHeader.setAttribute('data-' + config.classPrefix + '-day-in-month-date', '');
+
+                if (cellDate.getDate() === 1)
+                    isActive = !isActive;
+
+                if (!isActive) {
+                    tblRowCellHeader.setAttribute('data-' + config.classPrefix + '-day-in-month-date-not-active', '');
+                }
+                tblRowCellHeader.appendChild(document.createTextNode(DateFormat(cellDate, 'D')));
+
+                tblRowCell.appendChild(tblRowCellHeader);
+                tblRow.appendChild(tblRowCell);
+            }
+
+            tblBody.appendChild(tblRow);
+        }
+        tbl.appendChild(tblBody);
+        this.element.appendChild(tbl);
     }
     renderContent(): void {
 
@@ -438,16 +475,17 @@ class CaliContentWeekView extends CaliContentView {
     }
 
     getViewStart(): Date {
-        let base: Date = this.getCali().getActiveDate();
+        let base: Date = new Date('' + this.getCali().getActiveDate()); console.log(base);
         let d = new Date();
-        d.setDate(base.getDate() - base.getDay());
+        d.setFullYear(base.getFullYear(), base.getMonth(), base.getDate() - base.getDay());
 
         return d;
     }
     getViewEnd(): Date {
-        let base: Date = this.getCali().getActiveDate();
+        let base: Date = new Date('' + this.getCali().getActiveDate());
         let d = new Date();
-        d.setDate(base.getDate() + (6 - base.getDay()));
+        d.setFullYear(base.getFullYear(), base.getMonth(), base.getDate() + 6 - base.getDay());
+        //d.setDate(base.getDate() + (6 - base.getDay()));
 
         return d;
     }
@@ -456,20 +494,51 @@ class CaliContentWeekView extends CaliContentView {
     }
 
     renderGrid(): void {
-        let masterList = document.createElement('ol');
-        masterList.setAttribute('data-' + config.classPrefix + '-week', '');
+        let tbl = document.createElement('table');
+        tbl.setAttribute('data-' + config.classPrefix + '-week-grid', '');
 
-        for (let j = 0; j < 7; j++){
-            let masterListItem = document.createElement('li');
-            masterListItem.setAttribute('data-' + config.classPrefix + '-day-in-week', '');
-            let d = this.getViewStart();
-            d.setDate(d.getDate() + j);
-            masterListItem.appendChild(this.getDayGrid(d));
-            masterList.appendChild(masterListItem);
+        let tblHead = document.createElement('thead');
+        let tblHeadRow = document.createElement('tr');
+        for (let i = 0; i < 8; i++) {
+            let tblHeadRowCell = document.createElement('th');
+            tblHeadRowCell.setAttribute('data-' + config.classPrefix + '-grid-header', '');
+            if (i) {
+                let d = this.getCali().getActiveDate();
+                d.setDate(d.getDate() + i + 1);
+                tblHeadRowCell.appendChild(document.createTextNode(DateFormat(d, 'ddd D')));
+            }
+            tblHeadRow.appendChild(tblHeadRowCell);
         }
+        tblHead.appendChild(tblHeadRow);
+        tbl.appendChild(tblHead);
 
-        this.element.appendChild(this.getTimeColumn());
-        this.element.appendChild(masterList);
+        let tblBody = document.createElement('tbody');
+
+        for (let i = 0; i < 48; i++){
+            let tblRow = document.createElement('tr');
+
+            if (i%2===0){
+                let tblRowTimeCell = document.createElement('td');
+                tblRowTimeCell.rowSpan = 2;
+                tblRowTimeCell.className = 'data-' + config.classPrefix + '-time-column';
+                let z = '' + Math.floor(i/2);
+                z = (z.length === 1 ? '0' + z : z) + ':00';
+                tblRowTimeCell.appendChild(document.createTextNode(z));
+                tblRow.appendChild(tblRowTimeCell);
+            }
+
+            for (let j = 0; j < 7; j++) {
+                let tblRowCell = document.createElement('td');
+                tblRowCell.setAttribute('data-' + config.classPrefix + '-hour-in-day', '');
+                tblRow.appendChild(tblRowCell);
+            }
+
+            tblBody.appendChild(tblRow);
+        }
+        tbl.appendChild(tblBody);
+        this.element.appendChild(tbl);
+
+
     }
     renderContent(): void {
         let list = document.createElement('ol');
@@ -506,8 +575,43 @@ class CaliContentDayView extends CaliContentView {
     }
 
     renderGrid(): void {
-        this.element.appendChild(this.getTimeColumn());
-        this.element.appendChild(this.getDayGrid(this.getCali().getActiveDate()));
+        let tbl = document.createElement('table');
+        tbl.setAttribute('data-' + config.classPrefix + '-day-grid', '');
+
+        let tblHead = document.createElement('thead');
+        let tblHeadRow = document.createElement('tr');
+        for (let i = 0; i < 2; i++) {
+            let tblHeadRowCell = document.createElement('th');
+            tblHeadRowCell.setAttribute('data-' + config.classPrefix + '-grid-header', '');
+            if (i)
+                tblHeadRowCell.appendChild(document.createTextNode(DateFormat(this.getCali().getActiveDate(), 'ddd D')));
+            tblHeadRow.appendChild(tblHeadRowCell);
+        }
+        tblHead.appendChild(tblHeadRow);
+        tbl.appendChild(tblHead);
+
+        let tblBody = document.createElement('tbody');
+
+        for (let i = 0; i < 48; i++){
+            let tblRow = document.createElement('tr');
+
+            if (i%2===0){
+                let tblRowTimeCell = document.createElement('td');
+                tblRowTimeCell.rowSpan = 2;
+                tblRowTimeCell.className = 'data-' + config.classPrefix + '-time-column';
+                let z = '' + Math.floor(i/2);
+                z = (z.length === 1 ? '0' + z : z) + ':00';
+                tblRowTimeCell.appendChild(document.createTextNode(z));
+                tblRow.appendChild(tblRowTimeCell);
+            }
+
+            let tblRowCell = document.createElement('td');
+            tblRowCell.setAttribute('data-' + config.classPrefix + '-hour-in-day', '');
+            tblRow.appendChild(tblRowCell);
+            tblBody.appendChild(tblRow);
+        }
+        tbl.appendChild(tblBody);
+        this.element.appendChild(tbl);
     }
     renderContent(): void {
         let list = document.createElement('ol');

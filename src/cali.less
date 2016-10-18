@@ -1,5 +1,5 @@
 @from: left; @to: right;
-@primary: #f06; @primary-font: #fff;
+@primary: #F06; @primary-font: #fff;
 @second: #ddd; @second-font: #000;
 @radius: 5px;
 
@@ -63,56 +63,66 @@
     border: 1px solid @second;
     height: ~"calc(100% - 65px)"; overflow: auto;
 
-    [data-cali-day-grid] {
-      .resetUL();
-      width: 100%; height: 100%;
-
-      li { .list-item(); }
-      [data-cali-day-grid-title] {
-        background: #fff;
-        color: @primary;
-        font-weight: 700;
-        text-align: center;
-        border-bottom: 1px solid @primary;
-      }
-    }
-    [data-cali-week] {
-      .resetUL();
+    table {
+      border-collapse: collapse;
+      border: 2px solid @primary;
       width: 100%;
 
-      [data-cali-day-in-week] {
-        float: @from;
-        width: ~"calc((100% - 50px)/7)";
-        border-@{to}: 1px solid @primary;
+      tr {
+        td { border: 1px solid @second }
+        th { color: @primary; height: 25px; border: 1px solid @primary;}
+        .data-cali-time-column { width: 50px; text-align: center; vertical-align: middle; border-@{to}: 1px solid @primary; }
+        [data-cali-hour-in-day] { height: 25px;  }
 
-        &:last-of-type {  border: 0;  }
+        &:nth-child(even) {
+          td { background: fade(@second, 30%); }
+        }
       }
     }
-    [data-cali-time-column] {
-      .resetUL();
-      width: 50px; float: @from;
-      border-@{to}: 1px solid @primary;
-      padding-top: 25px;
 
-      li {
-        .list-item();
-        background: #fff; min-height: 50px;
-        &:nth-child(1) { border-top: 1px solid @second; }
-        &:nth-child(even){ background: #fff;}
+    [data-cali-day-grid]{
+
+    }
+    [data-cali-week-grid]{
+      th {
+        width: ~"calc((100%-50px)/7)";
+        &:nth-child(1){ min-width: 50px; width: 50px; }
       }
     }
-    [data-cali-content-wrap] {
-      .resetUL();
-      position: absolute; top: 0; @{from}: 50px; @{to}: 0;
+    [data-cali-month-grid] {
+      height:100%;
 
-      [data-cali-event] {
-        position: absolute;
-        margin: 0 3px; background: lighten(@primary, 40%);
-        border-@{from}: 4px solid @primary;
-        box-shadow: 0 0 0 1px #fff;
-        left: 0; right: 0; padding: 2px;
-        font-size: 11px;
+      th {width: ~"calc(100%/7)"; }
+
+      [data-cali-day-in-month] {
+        border: 1px solid @second;
+        vertical-align: top;
+        text-align: @to;
+
+
+        [data-cali-day-in-month-date] {  height: 20px; color: @primary; padding: 2px; font-size: 12px;  }
+        [data-cali-day-in-month-date-not-active] { color: @second; }
       }
     }
+
+  [data-cali-content-wrap] {
+    .resetUL();
+    position: absolute; top: 0; @{from}: 50px; @{to}: 0;
+
+    [data-cali-event] {
+
+      position: absolute;
+      margin: 0 3px; background: lighten(@primary, 40%);
+      border-@{from}: 4px solid @primary;
+      box-shadow: 0 0 0 1px #fff;
+      left: 0; right: 0; padding: 2px;
+      font-size: 11px;
+      opacity: 0.6;
+
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+  }
   }
 }
