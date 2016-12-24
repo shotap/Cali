@@ -1,19 +1,3 @@
-/**
- * according to RFC 4324 https://tools.ietf.org/html/rfc4324 definition for event
- *
- * BEGIN:VEVENT
- * DTSTART:20030307T180000Z
- * UID:FirstInThisExample-1
- * DTEND:20030307T190000Z
- * SUMMARY:Important Meeting
- * END:VEVENT
- * BEGIN:VEVENT
- * DTSTART:20040307T180000Z
- * UID:SecondInThisExample-2
- * DTEND:20040307T190000Z
- * SUMMARY:Important Meeting
- * END:VEVENT
- */
 interface iEvent {
     uid: string|number,
     title: string,
@@ -21,9 +5,10 @@ interface iEvent {
     end: Date,
     summary?: string,
     organizer?: string,
-
     overlap?: number,
     offset?: number
+
+    [key: string]: any;
 }
 
 var DateFormat = function (d: Date, format: string): string {
@@ -39,24 +24,36 @@ var DateFormat = function (d: Date, format: string): string {
     return res;
 };
 
+interface Date {
+    getWeekStart(): Date;
+    getWeekEnd(): Date;
+}
+Date.prototype.getWeekStart = function(){
+    let d = new Date();
+    d.setFullYear(this.getFullYear(), this.getMonth(), this.getDate() - this.getDay());
+    d.setHours(0);
+    d.setMinutes(0);
+    d.setSeconds(0);
+
+    return d;
+};
+Date.prototype.getWeekEnd = function(){
+    let d = new Date();
+    d.setFullYear(this.getFullYear(), this.getMonth(), this.getDate() + 6 - this.getDay());
+    d.setHours(24);
+    d.setMinutes(0);
+    d.setSeconds(0);
+
+    return d;
+};
+
+
 var data = [
-    {uid: 11,  title: '1',       start: new Date('2016/10/16 04:00:00') , end: new Date('2016/10/16 06:00:00')},
-    {uid: 12,  title: '2',       start: new Date('2016/10/16 07:00:00') , end: new Date('2016/10/16 09:00:00')},
-    {uid: 13,  title: '3',       start: new Date('2016/10/17 05:00:00') , end: new Date('2016/10/17 08:00:00')},
-    {uid: 14,  title: '3!',      start: new Date('2016/10/17 08:15:00') , end: new Date('2016/10/17 10:00:00')},
-    {uid: 15,  title: 'pi',      start: new Date('2016/10/17 05:00:00') , end: new Date('2016/10/17 05:30:00')},
-    {uid: 16,  title: '4',       start: new Date('2016/10/17 06:00:00') , end: new Date('2016/10/17 07:00:00')},
-    {uid: 17,  title: 'po',      start: new Date('2016/10/17 06:30:00') , end: new Date('2016/10/17 07:20:00')},
-    {uid: 18,  title: 'pe',      start: new Date('2016/10/17 06:45:00') , end: new Date('2016/10/17 07:45:00')},
-    {uid: 19,  title: 'ze',      start: new Date('2016/10/17 07:35:00') , end: new Date('2016/10/17 09:45:00')},
-    {uid: 20,  title: '5',       start: new Date('2016/10/18 04:00:00') , end: new Date('2016/10/18 12:00:00')},
-    {uid: 21,  title: '6',       start: new Date('2016/10/18 04:00:00') , end: new Date('2016/10/18 06:00:00')},
-    {uid: 22,  title: '7',       start: new Date('2016/10/19 04:00:00') , end: new Date('2016/10/19 08:00:00')},
-    {uid: 23,  title: '8',       start: new Date('2016/10/19 04:00:00') , end: new Date('2016/10/10 02:00:00')},
-    {uid: 24,  title: '9',       start: new Date('2016/10/18 04:00:00') , end: new Date('2016/10/18 05:00:00')},
-    {uid: 25, title: '10',       start: new Date('2016/10/18 04:00:00') , end: new Date('2016/10/18 06:00:00')},
-    {uid: 26, title: '11',       start: new Date('2016/10/19 04:00:00') , end: new Date('2016/10/19 05:00:00')},
-    {uid: 27, title: '12',       start: new Date('2016/10/20 04:00:00') , end: new Date('2016/10/20 06:00:00')},
+    {uid: 0, title:'first day', start: new Date('2016/12/01 03:00:00'), end: new Date('2016/12/21 06:21:00'), bgcolor: 'red', color: 'white'},
+    {uid: 1, title:'event title', start: new Date('2016/12/20 03:00:00'), end: new Date('2016/12/30 06:21:00'), bgcolor: 'red', color: 'white'},
+    {uid: 2, title:'event title', start: new Date('2016/12/22 03:00:00'), end: new Date('2016/12/26 06:21:00'), bgcolor: 'blue', color: 'white'},
+    {uid: 3, title:'event title', start: new Date('2016/12/06 03:00:00'), end: new Date('2016/12/09 06:21:00'), bgcolor: 'blue', color: 'white'},
+    {uid: 4, title:'event title', start: new Date('2016/12/23 03:00:00'), end: new Date('2016/12/25 06:21:00'), bgcolor: 'blue', color: 'white'}
 ];
 
 var config = {
@@ -64,6 +61,8 @@ var config = {
     view: 'week',
     rtl: false,
     rowHeight: 25,
+    monthHeight: 17,
+    endMargin: 10,
     headerButtons: 'year,month,week,day',
     monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     monthNamesShort: ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"],
@@ -79,21 +78,32 @@ var config = {
         'next': '>'
     }
 };
+
 class EventList {
     events: iEvent[];
 
     constructor(events: iEvent[]){
         this.events = events;
     }
+    static cloneEvent(_event: iEvent): iEvent{
+        var copy = _event.constructor();
+        for (var attr in _event) {
+            if (_event.hasOwnProperty(attr)) copy[attr] = _event[attr];
+        }
+        return copy;
+    }
     forEach(callback: (value: iEvent) => void) {
         if (this.events)
             this.events.forEach(callback);
     }
-    getFilteredAndSorted(startD: Date, endD: Date): iEvent[]{
+    getFilteredAndSorted(startDate: Date, endDate: Date): iEvent[]{
         let res: iEvent[] = [];
         this.events.map( (event: iEvent) => {
-            if (event.start.getTime() <= endD.getTime() && event.end.getTime() >= startD.getTime()){
-                res.push(event);
+            if (event.start.getTime() <= endDate.getTime() && event.end.getTime() >= startDate.getTime()){
+                var _event = EventList.cloneEvent(event);
+                if (event.start < startDate) _event.start = startDate;
+                if (event.end > endDate) _event.end = endDate;
+                res.push(_event);
             }
         });
 
@@ -128,7 +138,6 @@ abstract class CaliView {
     }
 
     getCali(): Cali {
-        console.log('get cali');
         if (!this.cali) {
             let parent:CaliView = this;
 
@@ -136,7 +145,7 @@ abstract class CaliView {
                 parent = parent.parent;
             }
 
-            return parent.cali;
+            this.cali = parent.cali;
         }
 
         return this.cali;
@@ -197,7 +206,7 @@ class CaliHeaderButtonsView extends CaliView {
 
     addButton(type: string): void{
         let btn = document.createElement('button');
-        btn.appendChild(document.createTextNode( Object.keys(config.buttonText).indexOf(type) != -1 ? config.buttonText[type] : type ));
+        btn.appendChild(document.createTextNode(Object.keys(config.buttonText).indexOf(type) != -1 ? (<any>config).buttonText[type] : type));
         btn.setAttribute('data-' + config.classPrefix + '-btn', '');
 
         if (['today', 'next', 'prev'].indexOf(type) === -1) {
@@ -210,7 +219,8 @@ class CaliHeaderButtonsView extends CaliView {
                 for (let i = 0; i < other.length; i++){
                     other[i].removeAttribute('data-' + config.classPrefix + '-view-btn-active');
                 }
-                e.srcElement.setAttribute('data-' + config.classPrefix + '-view-btn-active', '');
+                let target = <HTMLElement>(e.target || e.srcElement);
+                target.setAttribute('data-' + config.classPrefix + '-view-btn-active', '');
                 this.getCali().setView(type, true);
             });
         } else {
@@ -255,66 +265,102 @@ abstract class CaliContentView extends CaliView {
     getViewName(): string {
         return this.viewName;
     }
-    getEventElement(event: iEvent, parent: Element, maxOffset: number, isWeek?: boolean): Element[]{
+    getEventElement(event: iEvent, parent: Element, maxOffset: number, isWeek?: boolean, isMonth?: boolean): Element[]{
         let res: Element[] = [];
         let eventElement = document.createElement('li');
         eventElement.setAttribute('data-' + config.classPrefix + '-event', ''+event.uid);
-        eventElement.style.top = '' + ((event.start.getHours()+(event.start.getMinutes()/60))*config.rowHeight*2+config.rowHeight) + 'px';
+        eventElement.style.zIndex = "" + (100+event.offset);
         eventElement.appendChild(document.createTextNode(event.title));
+        if (event.hasOwnProperty('bgcolor')) eventElement.style.backgroundColor = event['bgcolor'];
+        if (event.hasOwnProperty('color')) eventElement.style.color = event['color'];
 
-        if (event.start.getDay() === event.end.getDay()){ // start and end in the same day
-            eventElement.style.height = '' + ((event.end.getTime()-event.start.getTime())/36e5*config.rowHeight*2) + 'px';
+        // Height
+        if (isMonth){
+            eventElement.style.height = '' + config.monthHeight + 'px';
+            let dayInMonth = this.getViewStart().getDay() + event.start.getDate();
+            eventElement.style.top = "calc(" + config.monthHeight + "px*" + (1 + event.offset) + " + ((100%-" + config.monthHeight + "px)/6) * " + Math.floor(dayInMonth/7) + ")";
         } else {
-            let midnight = new Date();
-            midnight.setTime(event.start.getTime());
-            midnight.setHours(24, 0, 0);
-            eventElement.style.height = '' + ((midnight.getTime()-event.start.getTime())/36e5*config.rowHeight*2) + 'px';
+            eventElement.style.top = '' + ((event.start.getHours() + (event.start.getMinutes() / 60)) * config.rowHeight * 2 + config.rowHeight) + 'px';
 
-            if (isWeek) {
-                let leftover = (event.end.getTime() - event.start.getTime()) / 36e5 - (midnight.getTime() - event.start.getTime()) / 36e5;
-                let leftoverDays = Math.min(Math.floor(leftover / 24) + 1, 6 - event.start.getDay()); // if this event starts but dosent end this week
+            if (event.start.getDay() === event.end.getDay()) { // start and end in the same day
+                eventElement.style.height = '' + ((event.end.getTime() - event.start.getTime()) / 36e5 * config.rowHeight * 2) + 'px';
+            } else {
+                let midnight = new Date();
+                midnight.setTime(event.start.getTime());
+                midnight.setHours(24, 0, 0);
+                eventElement.style.height = '' + ((midnight.getTime() - event.start.getTime()) / 36e5 * config.rowHeight * 2) + 'px';
 
-                for (let i = 1; i <= leftoverDays; i++) {
-                    let delta = Math.min(24, leftover - (24 * (i - 1)));
-                    let _event = JSON.parse(JSON.stringify(event)); // deep copy the event
+                if (isWeek) {
+                    let leftover = (event.end.getTime() - event.start.getTime()) / 36e5 - (midnight.getTime() - event.start.getTime()) / 36e5;
+                    let leftoverDays = Math.min(Math.floor(leftover / 24) + 1, 6 - event.start.getDay()); // if this event starts but dosent end this week
 
-                    let _start = new Date();
-                    _start.setTime(event.start.getTime());
-                    _start.setDate(_start.getDate() + i);
-                    _start.setHours(0, 1, 0);
+                    for (let i = 1; i <= leftoverDays; i++) {
+                        let delta = Math.min(24, leftover - (24 * (i - 1)));
+                        let _event = JSON.parse(JSON.stringify(event)); // deep copy the event
 
-                    let _end = new Date();
-                    _end.setTime(_start.getTime());
-                    if (delta === 24)   _end.setHours(23, 59);
-                    else                _end.setHours(delta);
+                        let _start = new Date();
+                        _start.setTime(event.start.getTime());
+                        _start.setDate(_start.getDate() + i);
+                        _start.setHours(0, 1, 0);
 
-                    _event.start = _start;
-                    _event.end = _end;
+                        let _end = new Date();
+                        _end.setTime(_start.getTime());
+                        if (delta === 24)   _end.setHours(23, 59);
+                        else                _end.setHours(delta);
 
-                    this.getEventElement(_event, parent, maxOffset, isWeek).forEach((r) => res.push(r));
+                        _event.start = _start;
+                        _event.end = _end;
+
+                        this.getEventElement(_event, parent, maxOffset, isWeek).forEach((r) => res.push(r));
+                    }
                 }
             }
         }
 
-        if (isWeek){
+        // Width
+        if (isMonth){
+            let dayInMonth = this.getViewStart().getDay() + event.start.getDate();
+            eventElement.style.right = 'initial';
+
+            let daysLeft: number;
+            if (event.start.getWeekStart().getTime() === event.end.getWeekStart().getTime()){
+                daysLeft = event.end.getDay() - event.start.getDay() + 1;
+            } else {
+                daysLeft = 6 - event.start.getDay() + 1;
+
+                let _event = EventList.cloneEvent(event);
+                _event.start.setDate(_event.start.getWeekEnd().getDate());
+
+                console.log(_event.start);
+
+                this.getEventElement(_event, parent, maxOffset, isWeek, isMonth).forEach((r) => res.push(r));
+            }
+            console.log(daysLeft);
+            eventElement.style.width = "calc((100%/7) * " + daysLeft + ")";
+
+            if (!config.rtl) {
+                eventElement.style.left = "calc((100%/7) * " + (Math.floor(dayInMonth%7) - 1) + ")";
+            } else {
+                eventElement.style.right = "calc((100%/7) * " + (Math.floor(dayInMonth%7) - 1) + ")";
+            }
+        } else if (isWeek){
             if (!config.rtl) {
                 eventElement.style.left = "calc(100%/7*" + event.start.getDay() + (event.offset ? " + " + event.offset + "*(100% - 50px)/7" + (event.overlap ? "/" + (1 + maxOffset) : "") : "") + ")";
-                eventElement.style.right = "calc(100%/7*" + (7 - event.start.getDay() - 1) + ")";
+                eventElement.style.right = "calc(100%/7*" + (7 - event.start.getDay() - 1) + " + " + config.endMargin + "px)";
             } else {
                 eventElement.style.right = "calc(100%/7*" + event.start.getDay() + (event.offset ? " + " + event.offset + "*(100% - 50px)/7" + (event.overlap ? "/" + (1 + maxOffset) : "") : "") + ")";
-                eventElement.style.left = "calc(100%/7*" + (7 - event.start.getDay() - 1) + ")";
+                eventElement.style.left = "calc(100%/7*" + (7 - event.start.getDay() - 1) + " + " + config.endMargin + "px)";
             }
         } else {
             if (!config.rtl) {
-                eventElement.style.left = event.offset ? "calc(" + event.offset + "*10%" : "0";
+                eventElement.style.left = event.offset ? "" + event.offset*10 + "%" : "0";
                 eventElement.style.right = "0";
             } else {
-                eventElement.style.right = event.offset ? "calc(" + event.offset + "*10%" : "0";
+                eventElement.style.right = event.offset ? "" + event.offset*10 + "%" : "0";
                 eventElement.style.left = "0";
             }
         }
 
-        eventElement.style.zIndex = "" + (100+event.offset);
         res.push(eventElement);
         return res;
     }
@@ -360,33 +406,7 @@ abstract class CaliContentView extends CaliView {
     abstract renderGrid(): void;
     abstract renderContent(): void;
 }
-class CaliContentYearView extends CaliContentView {
-    constructor(element: Element, parent: CaliView){
-        super(element, parent);
-        this.viewName = 'year';
-    }
 
-    getViewStart(): Date {
-        let d = new Date();
-        d.setFullYear(this.getCali().getActiveDate().getFullYear(), 0, 11);
-        return d;
-    }
-    getViewEnd(): Date {
-        let d = new Date();
-        d.setFullYear(this.getCali().getActiveDate().getFullYear(), 11, 31);
-        return d;
-    }
-    getTitle(): string {
-        return '' + this.getCali().getActiveDate().getFullYear();
-    }
-
-    renderGrid(): void {
-
-    }
-    renderContent(): void {
-
-    }
-}
 class CaliContentMonthView extends CaliContentView {
     constructor(element: Element, parent: CaliView){
         super(element, parent);
@@ -397,6 +417,9 @@ class CaliContentMonthView extends CaliContentView {
         let base: Date = this.getCali().getActiveDate();
         let d = new Date();
         d.setFullYear(base.getFullYear(), base.getMonth(), 1);
+        d.setHours(0);
+        d.setMinutes(0);
+        d.setSeconds(0);
 
         return d;
     }
@@ -404,6 +427,9 @@ class CaliContentMonthView extends CaliContentView {
         let base = this.getCali().getActiveDate();
         let d = new Date();
         d.setFullYear(base.getFullYear(), base.getMonth() + 1, 0);
+        d.setHours(0);
+        d.setMinutes(0);
+        d.setSeconds(0);
 
         return d;
     }
@@ -465,7 +491,13 @@ class CaliContentMonthView extends CaliContentView {
         this.element.appendChild(tbl);
     }
     renderContent(): void {
+        let list = document.createElement('ol');
+        list.setAttribute('data-' + config.classPrefix + '-content-wrap', '');
+        list.classList.add('month');
 
+        let filttered: [iEvent[], number] = this.getFilteredEvents();
+        filttered[0].forEach( (event, i) => this.getEventElement(event, list, filttered[1], false, true).forEach( (e) => { list.appendChild(e); } ) );
+        this.element.appendChild(list);
     }
 }
 class CaliContentWeekView extends CaliContentView {
@@ -475,19 +507,10 @@ class CaliContentWeekView extends CaliContentView {
     }
 
     getViewStart(): Date {
-        let base: Date = new Date('' + this.getCali().getActiveDate()); console.log(base);
-        let d = new Date();
-        d.setFullYear(base.getFullYear(), base.getMonth(), base.getDate() - base.getDay());
-
-        return d;
+        return this.getCali().getActiveDate().getWeekStart();
     }
     getViewEnd(): Date {
-        let base: Date = new Date('' + this.getCali().getActiveDate());
-        let d = new Date();
-        d.setFullYear(base.getFullYear(), base.getMonth(), base.getDate() + 6 - base.getDay());
-        //d.setDate(base.getDate() + (6 - base.getDay()));
-
-        return d;
+        return this.getCali().getActiveDate().getWeekEnd();
     }
     getTitle(): string {
         return '' + DateFormat(this.getViewStart(), 'D MMM') + ' - ' + DateFormat(this.getViewEnd(), 'D MMM');
@@ -503,8 +526,8 @@ class CaliContentWeekView extends CaliContentView {
             let tblHeadRowCell = document.createElement('th');
             tblHeadRowCell.setAttribute('data-' + config.classPrefix + '-grid-header', '');
             if (i) {
-                let d = this.getCali().getActiveDate();
-                d.setDate(d.getDate() + i + 1);
+                let d = this.getViewStart();
+                d.setDate(d.getDate() + i - 1);
                 tblHeadRowCell.appendChild(document.createTextNode(DateFormat(d, 'ddd D')));
             }
             tblHeadRow.appendChild(tblHeadRowCell);
@@ -637,11 +660,6 @@ class Cali {
         if (events)
             this.events = new EventList(events);
 
-        this.contentElement = this.element.querySelectorAll('[data-' + config.classPrefix + '-content]')[0];
-        if (this.contentElement){
-            this.setView(this.contentElement.getAttribute('data-' + config.classPrefix + '-content'), false);
-        }
-
         let header = this.element.querySelectorAll('[data-' + config.classPrefix + '-header]')[0];
         let headerObj: CaliView = null;
         if (header){
@@ -650,8 +668,12 @@ class Cali {
         }
         this.header = headerObj;
 
-
-        this.render();
+        this.contentElement = this.element.querySelectorAll('[data-' + config.classPrefix + '-content]')[0];
+        if (this.contentElement){
+            this.setView(this.contentElement.getAttribute('data-' + config.classPrefix + '-content'), false);
+        } else {
+            throw 'there must be a content element';
+        }
     }
     setView(type: string, toRender: boolean): void {
         let contentObj: CaliContentView = null;
@@ -660,7 +682,6 @@ class Cali {
             case 'month': contentObj = new CaliContentMonthView(this.contentElement, null); break;
             case 'week': contentObj = new CaliContentWeekView(this.contentElement, null); break;
             case 'day': contentObj = new CaliContentDayView(this.contentElement, null); break;
-            case 'year': contentObj = new CaliContentYearView(this.contentElement, null); break;
             default: throw 'Not supported view type';
         }
         if (contentObj){
@@ -673,7 +694,8 @@ class Cali {
         return this.content.getViewName();
     }
     getActiveDate(): Date {
-        return this.activeDate;
+        let d = new Date(this.activeDate.toDateString());
+        return d;
     }
     getTitle(): string {
         return this.content.getTitle();
@@ -692,12 +714,11 @@ class Cali {
     }
     prev(): void {
         switch (this.content.getViewName()){
-            case 'month':this.activeDate.setFullYear(this.activeDate.getFullYear(), this.activeDate.getMonth() - 1); break;
+            case 'month': this.activeDate.setFullYear(this.activeDate.getFullYear(), this.activeDate.getMonth() - 1); break;
             case 'week':  this.activeDate.setDate(this.activeDate.getDate() - 7); break;
             case 'day':   this.activeDate.setDate(this.activeDate.getDate() - 1); break;
             case 'year':  this.activeDate.setDate(this.activeDate.getDate() - 365); break;
         }
-
         this.render();
     }
     today(): void {
@@ -716,7 +737,6 @@ class Cali {
 }
 
 let caliElements = document.querySelectorAll('[data-' + config.classPrefix + ']');
-
 for (let i = 0; i < caliElements.length; i++){
     new Cali(caliElements[i], data);
 }

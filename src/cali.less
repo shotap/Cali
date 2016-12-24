@@ -1,6 +1,9 @@
 @from: left; @to: right;
-@primary: #F06; @primary-font: #fff;
-@second: #ddd; @second-font: #000;
+@primary: #F06;
+@primary-font: #fff;
+@second: #ddd;
+@second-font: #000;
+@gray: #aaa;
 @radius: 5px;
 
 .resetButton(){
@@ -28,16 +31,16 @@
   box-sizing: border-box;
   width: 80%; margin: 0 10%;
   padding: 5px;
-  height: 600px;
+  height: 90%;
   border: 1px solid @primary;
   border-radius: @radius;
-  * { box-sizing: border-box; font-family: Arial; }
+  * { box-sizing: border-box; font-family: Arial; user-select: none; cursor: default; }
 
   [data-cali-header] {
     display: flex;  flex-direction: row;  align-items: center;
     justify-content: space-between; height: 50px;
 
-    [data-cali-header-title] { font-size: 20px; color: @primary; }
+    [data-cali-header-title] { color: @primary; }
     [data-cali-btn-group] {
       border: 1px solid @primary;
       border-radius: @radius;
@@ -70,7 +73,10 @@
 
       tr {
         td { border: 1px solid @second }
-        th { color: @primary; height: 25px; border: 1px solid @primary;}
+        th {
+          color: @primary; height: 25px; border: 1px solid @primary;
+          white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis;
+        }
         .data-cali-time-column { width: 50px; text-align: center; vertical-align: middle; border-@{to}: 1px solid @primary; }
         [data-cali-hour-in-day] { height: 25px;  }
 
@@ -100,27 +106,33 @@
         text-align: @to;
 
 
-        [data-cali-day-in-month-date] {  height: 20px; color: @primary; padding: 2px; font-size: 12px;  }
+        [data-cali-day-in-month-date] { color: @primary; padding: 2px; font-size: 12px;  }
         [data-cali-day-in-month-date-not-active] { color: @second; }
       }
     }
 
   [data-cali-content-wrap] {
     .resetUL();
-    position: absolute; top: 0; @{from}: 50px; @{to}: 0;
+    position: absolute; top: 0; @{from}: 50px; @{to}: 0; bottom: 0;
+
+    &.month {
+      @{from}: 0; top: 25px;
+    }
 
     [data-cali-event] {
-
       position: absolute;
-      margin: 0 3px; background: lighten(@primary, 40%);
-      border-@{from}: 4px solid @primary;
+      background: lighten(@primary, 40%);
+      border-@{from}: 4px solid @gray;
       box-shadow: 0 0 0 1px #fff;
       left: 0; right: 0; padding: 2px;
       font-size: 11px;
-      opacity: 0.6;
+      //opacity: 0.6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       &:hover {
-        opacity: 0.9;
+        opacity: 0.75;
       }
     }
   }
