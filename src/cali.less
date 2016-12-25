@@ -5,7 +5,7 @@
 @second-font: #000;
 @gray: #aaa;
 @radius: 5px;
-@mobileMaxWidth: 900px;
+@mobileMaxWidth: 750px;
 
 .resetButton(){
   border: 0;
@@ -30,9 +30,7 @@
 
 [data-cali] {
   box-sizing: border-box;
-  width: 80%; margin: 0 10%;
-  padding: 5px;
-  height: 90%;
+  width: 90%; margin: 0 5%;  padding: 5px;  height: 90%;
   border: 1px solid @primary;
   border-radius: @radius;
   * { box-sizing: border-box; font-family: Arial; user-select: none; cursor: default; }
@@ -75,25 +73,18 @@
       width: 100%;
 
       tr {
-        td { border: 1px solid @second }
+        td {
+          border: 1px solid @second;
+
+          &[data-cali-day-in-month-not-active] { background: fade(@gray,10%); }
+        }
         th {
           color: @primary; height: 25px; border: 1px solid @primary;
           white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis;
         }
 
-        @media screen and (max-width: @mobileMaxWidth) {
-          th {
-            visibility:hidden;
-            &::first-letter { visibility: visible; }
-          }
-        }
-
         .data-cali-time-column { width: 50px; text-align: center; vertical-align: middle; border-@{to}: 1px solid @primary; }
         [data-cali-hour-in-day] { height: 25px;  }
-
-        &:nth-child(even) {
-          td { background: fade(@second, 30%); }
-        }
       }
     }
 
@@ -117,9 +108,8 @@
         vertical-align: top;
         text-align: @to;
 
-
         [data-cali-day-in-month-date] { color: @primary; padding: 2px; font-size: 12px;  }
-        [data-cali-day-in-month-date-not-active] { color: @second; }
+        [data-cali-day-in-month-date-not-active] { color: darken(@second, 10%); }
       }
     }
 
@@ -135,16 +125,23 @@
         position: absolute;
         background: lighten(@primary, 40%);
         border-@{from}: 4px solid @gray;
-        box-shadow: 0 0 0 1px #fff;
+        border-bottom: 4px solid @gray;
+        border-top: 1px solid @gray;
+        border-@{to}: 1px solid @gray;
         left: 0; right: 0; padding: 2px;
         font-size: 11px;
         opacity: 0.6;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        padding-@{from}: 7px;
 
-        &:hover {
-          opacity: 0.75;
+        &:hover {  opacity: 0.75;  }
+      }
+
+      &.month {
+        [data-cali-event] {
+          border: 1px solid #fff;
         }
       }
     }
@@ -154,5 +151,27 @@
     [data-cali-no-mobile]{
       display: none;
     }
+  }
+}
+
+@keyframes mobile-on {
+  from { clip: rect(1px, auto, auto, auto); }
+  to { clip: rect(0px, auto, auto, auto); }
+}
+@keyframes mobile-off {
+  from { clip: rect(1px, auto, auto, auto); }
+  to { clip: rect(0px, auto, auto, auto); }
+}
+body {
+  animation-duration: 0.001s;
+}
+@media screen and (max-width: @mobileMaxWidth) {
+  body {
+    animation-name: mobile-on;
+  }
+}
+@media screen and (min-width: @mobileMaxWidth) {
+  body {
+    animation-name: mobile-off;
   }
 }
