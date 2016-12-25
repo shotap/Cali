@@ -43,13 +43,6 @@
 
     [data-cali-header-title] { color: @primary; }
 
-    @media screen and (max-width: @mobileMaxWidth) {
-      [data-cali-header-navigation]{
-        display: none;
-      }
-    }
-
-
     [data-cali-btn-group] {
       border: 1px solid @primary;
       border-radius: @radius;
@@ -130,30 +123,36 @@
       }
     }
 
-  [data-cali-content-wrap] {
-    .resetUL();
-    position: absolute; top: 0; @{from}: 50px; @{to}: 0; bottom: 0;
+    [data-cali-content-wrap] {
+      .resetUL();
+      position: absolute; top: 0; @{from}: 50px; @{to}: 0; bottom: 0;
 
-    &.month {
-      @{from}: 0; top: 25px;
-    }
+      &.month {
+        @{from}: 0; top: 25px;
+      }
 
-    [data-cali-event] {
-      position: absolute;
-      background: lighten(@primary, 40%);
-      border-@{from}: 4px solid @gray;
-      box-shadow: 0 0 0 1px #fff;
-      left: 0; right: 0; padding: 2px;
-      font-size: 11px;
-      opacity: 0.6;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      [data-cali-event] {
+        position: absolute;
+        background: lighten(@primary, 40%);
+        border-@{from}: 4px solid @gray;
+        box-shadow: 0 0 0 1px #fff;
+        left: 0; right: 0; padding: 2px;
+        font-size: 11px;
+        opacity: 0.6;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
-      &:hover {
-        opacity: 0.75;
+        &:hover {
+          opacity: 0.75;
+        }
       }
     }
   }
+
+  @media screen and (max-width: @mobileMaxWidth) {
+    [data-cali-no-mobile]{
+      display: none;
+    }
   }
 }
