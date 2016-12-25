@@ -49,11 +49,11 @@ Date.prototype.getWeekEnd = function(){
 
 
 var data = [
-    {uid: 0, title:'first day', start: new Date('2016/12/01 03:00:00'), end: new Date('2016/12/21 06:21:00'), bgcolor: 'red', color: 'white'},
-    {uid: 1, title:'event title', start: new Date('2016/12/20 03:00:00'), end: new Date('2016/12/30 06:21:00'), bgcolor: 'red', color: 'white'},
-    {uid: 2, title:'event title', start: new Date('2016/12/22 03:00:00'), end: new Date('2016/12/26 06:21:00'), bgcolor: 'blue', color: 'white'},
-    {uid: 3, title:'event title', start: new Date('2016/12/06 03:00:00'), end: new Date('2016/12/09 06:21:00'), bgcolor: 'blue', color: 'white'},
-    {uid: 4, title:'event title', start: new Date('2016/12/23 03:00:00'), end: new Date('2016/12/25 06:21:00'), bgcolor: 'blue', color: 'white'}
+    {uid: 0, title:'first day', start: new Date('2016/12/01 03:00:00'), end: new Date('2016/12/21 06:21:00')},
+    {uid: 1, title:'event title', start: new Date('2016/12/20 04:00:00'), end: new Date('2016/12/30 06:21:00')},
+    {uid: 2, title:'event title', start: new Date('2016/12/22 05:00:00'), end: new Date('2016/12/26 06:21:00')},
+    {uid: 3, title:'event title', start: new Date('2016/12/06 06:00:00'), end: new Date('2016/12/09 06:21:00')},
+    {uid: 4, title:'event title', start: new Date('2016/12/23 07:00:00'), end: new Date('2016/12/25 06:21:00')}
 ];
 
 var config = {

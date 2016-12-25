@@ -5,6 +5,7 @@
 @second-font: #000;
 @gray: #aaa;
 @radius: 5px;
+@mobileMaxWidth: 900px;
 
 .resetButton(){
   border: 0;
@@ -41,6 +42,14 @@
     justify-content: space-between; height: 50px;
 
     [data-cali-header-title] { color: @primary; }
+
+    @media screen and (max-width: @mobileMaxWidth) {
+      [data-cali-header-navigation]{
+        display: none;
+      }
+    }
+
+
     [data-cali-btn-group] {
       border: 1px solid @primary;
       border-radius: @radius;
@@ -59,6 +68,7 @@
       }
     }
   }
+
   [data-cali-content] {
     margin-top: 15px;
     position: relative;
@@ -77,6 +87,14 @@
           color: @primary; height: 25px; border: 1px solid @primary;
           white-space: nowrap;  overflow: hidden;  text-overflow: ellipsis;
         }
+
+        @media screen and (max-width: @mobileMaxWidth) {
+          th {
+            visibility:hidden;
+            &::first-letter { visibility: visible; }
+          }
+        }
+
         .data-cali-time-column { width: 50px; text-align: center; vertical-align: middle; border-@{to}: 1px solid @primary; }
         [data-cali-hour-in-day] { height: 25px;  }
 
@@ -89,6 +107,7 @@
     [data-cali-day-grid]{
 
     }
+
     [data-cali-week-grid]{
       th {
         width: ~"calc((100%-50px)/7)";
@@ -126,7 +145,7 @@
       box-shadow: 0 0 0 1px #fff;
       left: 0; right: 0; padding: 2px;
       font-size: 11px;
-      //opacity: 0.6;
+      opacity: 0.6;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
